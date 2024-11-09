@@ -1,0 +1,13 @@
+/* OttHeroSlider.css */
+.iq-banner-thumb-slider {
+  overflow: hidden;
+}
+
+.slider {
+  transform: translateX(100%);
+  transition: transform 0.5s ease-in-out;
+}
+
+.iq-banner-thumb-slider.loaded .slider {
+  transform: translateX(0);
+}

@@ -1,0 +1,166 @@
+.streamit-block .swiper-wrapper {
+  margin: 0 !important;
+}
+.top-ten-block .swiper-wrapper {
+  margin-bottom: 3rem;
+}
+.swiper-backface-hidden .swiper-slide {
+  transform: unset !important;
+  backface-visibility: visible !important;
+}
+
+.episode-thumbnail {
+  width: 100%;
+  object-fit: cover;
+}
+
+.episode-play {
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .episode-block {
+    width: 100% !important;
+  }
+}
+
+.space-between {
+  justify-content: space-between;
+}
+
+.pay-button {
+  cursor: pointer;
+  background-color: #c62d0e;
+  color: #fff;
+  border: none;
+  padding: 1rem;
+  width: 100%;
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 1.5rem;
+  border-radius: 0.3rem;
+}
+
+/* PopularMovies.css */
+.iq-banner-thumb-slider {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.slider {
+  transform: translateX(100%);
+  transition: opacity 1s ease-in-out;
+}
+
+.iq-banner-thumb-slider.loaded .slider {
+  transform: translateX(0);
+}
+
+/* Movies & Tv Shows Detail page */
+
+.detail-page {
+  opacity: 0;
+  transform: translateX(100%);
+  transition: opacity 0.5s ease-in-out;
+}
+
+.detail-page.loaded {
+  opacity: 1;
+  transform: translateX(0%);
+}
+
+.movie-details-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  justify-content: space-between;
+  margin-top: 40px;
+}
+
+.movie-details-content {
+  height: 50%;
+  flex: 1;
+}
+
+.movie-details-description {
+  align-items: center;
+  flex: 1;
+  padding-left: 1rem;
+}
+
+.video-js {
+  width: 100% !important;
+  height: 45vh;
+}
+
+.text-strong {
+  font-weight: 800;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+}
+
+.trailer-tag {
+  position: absolute;
+  top: 35px;
+  left: 10px;
+  background-color: rgba(245, 0, 0, 0.7);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 0.9rem;
+  width: 80px;
+  text-align: center;
+  z-index: 10;
+}
+
+/* PopoutPlayer */
+.pop-out-player {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.pop-out-player.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.pop-out-player .player-container {
+  max-width: 80%;
+  max-height: 80%;
+  position: relative;
+}
+
+.cast-list {
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+}
+
+.cast-item {
+  margin-right: 1rem;
+}
+
+.cast-image {
+  width: 100px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 5px;
+}

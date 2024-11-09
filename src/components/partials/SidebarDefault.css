@@ -1,0 +1,23 @@
+/* SidebarDefault.css */
+.sidebar-container {
+  width: 250px; /* Adjust the width as needed */
+  height: 100vh; /* Full height */
+  position: fixed; /* Fix the sidebar to the side */
+  top: 0;
+  left: 0;
+  background-color: #1f242d; /* Background color */
+  color: #fff;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Optional shadow */
+}
+
+.main-content {
+  margin-left: 250px; /* Same width as the sidebar */
+  padding: 20px; /* Optional padding */
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
