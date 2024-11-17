@@ -11,13 +11,42 @@ const LoginPage = memo(() => {
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
   const facebookAppId = import.meta.env.VITE_FACEBOOK_APP_ID;
 
+  const generateDeviceId = async () => {
+    const userAgent = navigator.userAgent;
+    const timestamp = Date.now();
+    const randomNum = Math.random().toString(36).substring(2, 15);
+
+    const rawId = `${userAgent}-${timestamp}-${randomNum}`;
+
+    const hashBuffer = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(rawId)
+    );
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((byte) => byte.toString(16).padStart(2, "0")).join("");
+  };
+
+  const getDeviceInfo = async () => {
+    const deviceId = await generateDeviceId();
+    const deviceInfo = {
+      userAgent: navigator.userAgent,
+      deviceBrand: "Desktop App",
+      language: navigator.language,
+      online: navigator.onLine,
+      deviceId: deviceId,
+    };
+    console.log("Device Info:", deviceInfo);
+    return deviceInfo;
+  };
+
   const sendGoogleCredential = async (credential) => {
+    const deviceInfo = await getDeviceInfo();
     const response = await fetch(
       `${import.meta.env.VITE_API_URL}/auth/google`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ credential }),
+        body: JSON.stringify({ credential, deviceInfo }),
       }
     );
     return response.json();
@@ -49,8 +78,15 @@ const LoginPage = memo(() => {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const data = await sendGoogleCredential(credentialResponse.credential);
-      localStorage.setItem("jwtToken", data.token);
+      const response = await sendGoogleCredential(
+        credentialResponse.credential
+      );
+      console.log("Google Response:", response);
+      if (response.status === "limit_reached") {
+        alert(response.message); // Display the message to the user
+        return; // Prevent further navigation
+      }
+      localStorage.setItem("jwtToken", response.token);
       window.dispatchEvent(new Event("authChange"));
       handleNavigation("/");
     } catch (error) {
