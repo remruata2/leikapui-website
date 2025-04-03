@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { theme_scheme_direction } from "../../store/setting/selectors";
 import { useTranslation } from "react-i18next";
 import "./OttHeroSlider.css";
+import { IoChevronBackOutline, IoChevronForwardOutline } from "react-icons/io5";
 
 const OttHeroSlider = memo(() => {
   const { t } = useTranslation();
@@ -113,10 +114,10 @@ const OttHeroSlider = memo(() => {
                     }}
                     spaceBetween={24}
                     loop={true}
-                    slidesPerView={2}
+                    slidesPerView={1}
                     breakpoints={{
                       0: { direction: "horizontal", slidesPerView: 1 },
-                      768: { direction: "horizontal", slidesPerView: 2 },
+                      // 768: { direction: "horizontal", slidesPerView: 2 },
                     }}
                     watchSlidesProgress={true}
                     modules={[Navigation, Thumbs]}
@@ -157,13 +158,13 @@ const OttHeroSlider = memo(() => {
                     className="slider-prev swiper-button"
                     onClick={() => setActive(!active)}
                   >
-                    <i className="iconly-Arrow-Left-2 icli"></i>
+                    <IoChevronBackOutline size={24} />
                   </div>
                   <div
                     className="slider-next swiper-button"
                     onClick={() => setActive(!active)}
                   >
-                    <i className="iconly-Arrow-Right-2 icli"></i>
+                    <IoChevronForwardOutline size={24} />
                   </div>
                 </div>
               </div>

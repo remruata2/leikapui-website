@@ -2,6 +2,7 @@ import { lazy } from "react";
 // layout
 import FrontendLayout from "../layouts/FrontendLayout";
 import BlankLayout from "../layouts/BlankLayout";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 // pages
 const OTTPage = lazy(() => import("../views/MainPages/OTTPage"));
@@ -40,10 +41,13 @@ const SidebarList = lazy(() => import("../views/BlogPages/SidebarListPage"));
 
 // extra pages
 const AboutPage = lazy(() => import("../views/ExtraPages/AboutPage"));
-const ContactPage = lazy(() => import("../views/ExtraPages/ContactPage"));
+const ContactPage = lazy(() => import("../views/ExtraPages/ContactUs"));
 const FAQPage = lazy(() => import("../views/ExtraPages/FAQPage"));
 const PrivacyPolicy = lazy(() => import("../views/ExtraPages/PrivacyPolicy"));
 const TermsofUse = lazy(() => import("../views/ExtraPages/TermsofUse"));
+const CancellationRefund = lazy(() =>
+  import("../views/ExtraPages/CancellationRefund")
+);
 const PricingPage = lazy(() => import("../views/PricingPage"));
 const ErrorPage1 = lazy(() => import("../views/ExtraPages/ErrorPage1"));
 const ErrorPage2 = lazy(() => import("../views/ExtraPages/ErrorPage2"));
@@ -101,71 +105,139 @@ export const LandingpageRouter = [
       },
       {
         path: "/movies",
-        element: <MoviePage />,
+        element: (
+          <ProtectedRoute>
+            <MoviePage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/movies-detail/:id",
-        element: <MovieDetail />,
+        element: (
+          <ProtectedRoute>
+            <MovieDetail />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/tv-shows",
-        element: <TvShowsList />,
+        element: (
+          <ProtectedRoute>
+            <TvShowsList />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/shows-details/:id",
-        element: <TvShowsDetail />,
+        element: (
+          <ProtectedRoute>
+            <TvShowsDetail />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/episodes",
-        element: <LatestEpisodes />,
+        element: (
+          <ProtectedRoute>
+            <LatestEpisodes />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/videos",
-        element: <VideoList />,
+        element: (
+          <ProtectedRoute>
+            <VideoList />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/videos-detail",
-        element: <VideoDetail />,
+        element: (
+          <ProtectedRoute>
+            <VideoDetail />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/restricted-content",
-        element: <RestrictedPage />,
+        element: (
+          <ProtectedRoute>
+            <RestrictedPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/related-merchandise",
-        element: <RelatedMerchandisePage />,
+        element: (
+          <ProtectedRoute>
+            <RelatedMerchandisePage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/playlist",
-        element: <Playlist />,
+        element: (
+          <ProtectedRoute>
+            <Playlist />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/watchlist-detail",
-        element: <WatchlistDetail />,
+        element: (
+          <ProtectedRoute>
+            <WatchlistDetail />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/geners",
-        element: <GenresPage />,
+        element: (
+          <ProtectedRoute>
+            <GenresPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/all-genres",
-        element: <AllGenres />,
+        element: (
+          <ProtectedRoute>
+            <AllGenres />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/tags",
-        element: <TagsPage />,
+        element: (
+          <ProtectedRoute>
+            <TagsPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/cast",
-        element: <CastList />,
+        element: (
+          <ProtectedRoute>
+            <CastList />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/cast-detail",
-        element: <DetailPage />,
+        element: (
+          <ProtectedRoute>
+            <DetailPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/cast-view-all",
-        element: <CastViewAll />,
+        element: (
+          <ProtectedRoute>
+            <CastViewAll />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/blogs",
@@ -208,10 +280,6 @@ export const LandingpageRouter = [
         element: <BlogSingle />,
       },
       {
-        path: "/pricing",
-        element: <PricingPage />,
-      },
-      {
         path: "/about-us",
         element: <AboutPage />,
       },
@@ -220,7 +288,11 @@ export const LandingpageRouter = [
         element: <ContactPage />,
       },
       {
-        path: "/PrivacyPolicy",
+        path: "/faq",
+        element: <FAQPage />,
+      },
+      {
+        path: "/privacy-policy",
         element: <PrivacyPolicy />,
       },
       {
@@ -228,24 +300,44 @@ export const LandingpageRouter = [
         element: <TermsofUse />,
       },
       {
-        path: "/faq",
-        element: <FAQPage />,
+        path: "/cancellation-refund",
+        element: <CancellationRefund />,
+      },
+      {
+        path: "/pricing",
+        element: <PricingPage />,
       },
       {
         path: "/view-all",
-        element: <ViewAll />,
+        element: (
+          <ProtectedRoute>
+            <ViewAll />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/all-products",
-        element: <AllProduct />,
+        element: (
+          <ProtectedRoute>
+            <AllProduct />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/product-detail",
-        element: <ProductDetail />,
+        element: (
+          <ProtectedRoute>
+            <ProductDetail />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/account",
-        element: <MyAccount />,
+        element: (
+          <ProtectedRoute>
+            <MyAccount />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/checkout",

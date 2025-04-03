@@ -11,3 +11,35 @@
 .iq-banner-thumb-slider.loaded .slider {
   transform: translateX(0);
 }
+
+.swiper-button {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.swiper-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.slider-prev {
+  margin-right: 10px;
+}
+
+.slider-next {
+  margin-left: 10px;
+}
+
+/* Make sure icons are centered */
+.swiper-button svg {
+  display: block;
+}

@@ -8,7 +8,21 @@ import { FaCartPlus } from "react-icons/fa";
 import axios from "axios";
 import Swal from "sweetalert2";
 import PopOutPlayer from "./PopOutPlayer";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../context/AuthContext";
+import "./DetailPage.css";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Thumbs } from "swiper";
+import { useNavigate } from "react-router-dom";
+
+const CastCard = memo(({ image_url, name, role }) => (
+  <div className="cast-item">
+    <img src={image_url} alt={name} className="cast-image" />
+    <p className="cast-name">{name || "Loading..."}</p>
+    <p className="cast-role">{role}</p>
+  </div>
+));
+
+CastCard.displayName = "CastCard";
 
 const DetailPage = memo(() => {
   const [toggler, setToggler] = useState(false);
@@ -28,7 +42,8 @@ const DetailPage = memo(() => {
   const [videoJsOptions, setVideoJsOptions] = useState([]);
   const [videoJsTrailerOptions, setVideoJsTrailerOptions] = useState([]);
   const [trailerUrl, setTrailerUrl] = useState(null);
-  const isLoggedIn = useAuth();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   const fetchData = useCallback(async () => {
     try {
@@ -60,10 +75,10 @@ const DetailPage = memo(() => {
       const movieData = movieResponse.data.data;
       movieData.release_year = new Date(movieData.release_date).getFullYear();
       setSelectedMovie(movieData);
-
       if (movieData.trailer_url) {
         setTrailerUrl(movieData.trailer_url);
       }
+      console.log("Trailer url", movieData.trailer_url);
 
       // Set like status and count
       if (likeStatusResponse) {
@@ -78,18 +93,16 @@ const DetailPage = memo(() => {
         setRemainingTime(remainingTime);
       }
 
-      // Fetch person details
-      const personDetailsPromises = movieData.castAndCrews.map(
-        async (person) => {
-          const response = await axios.get(
-            `${apiUrl}/api/persons/${person.person}`
-          );
-          return { ...response.data, role: person.role, type: person.type };
-        }
-      );
+      // Process person details directly from the populated data
+      const personDetails = movieData.castAndCrews.map((castCrew) => ({
+        _id: castCrew.person._id,
+        name: castCrew.person.name,
+        image_url: castCrew.person.image_url,
+        role: castCrew.role,
+        type: castCrew.type,
+      }));
 
-      const personDetailsArray = await Promise.all(personDetailsPromises);
-      setPersonDetails(personDetailsArray);
+      setPersonDetails(personDetails);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -110,7 +123,7 @@ const DetailPage = memo(() => {
       techOrder: ["youtube"],
       sources: [
         {
-          src: "https://www.youtube.com/watch?v=Q1GlkwGSkO0",
+          src: `https://www.youtube.com/watch?v=${trailerUrl}`,
           type: "video/youtube",
         },
       ],
@@ -124,7 +137,7 @@ const DetailPage = memo(() => {
       techOrder: ["youtube"],
       sources: [
         {
-          src: trailerUrl || "", // Use an empty string if trailerUrl is null or undefined
+          src: `https://www.youtube.com/watch?v=${trailerUrl}` || "", // Use an empty string if trailerUrl is null or undefined
           type: "video/youtube",
         },
       ],
@@ -153,8 +166,8 @@ const DetailPage = memo(() => {
   );
 
   const handlePayment = useCallback(async () => {
-    if (!isLoggedIn) {
-      Swal.fire({ icon: "error", title: "Please login first" });
+    if (!isAuthenticated) {
+      navigate("/login", { state: { from: location } });
       return;
     }
     try {
@@ -195,13 +208,23 @@ const DetailPage = memo(() => {
     } catch (error) {
       console.error("Error initiating payment:", error);
     }
-  }, [apiUrl, fetchData, movieId, selectedMovie, user]);
+  }, [
+    apiUrl,
+    fetchData,
+    movieId,
+    selectedMovie,
+    user,
+    isAuthenticated,
+    navigate,
+    location,
+  ]);
 
   const handleLikeClick = useCallback(async () => {
-    if (!user) {
-      Swal.fire({ icon: "error", title: "Please login first" });
+    if (!isAuthenticated) {
+      navigate("/login", { state: { from: location } });
       return;
     }
+
     try {
       const response = await axios.post(
         `${apiUrl}/api/movies/${movieId}/like`,
@@ -219,7 +242,7 @@ const DetailPage = memo(() => {
     } catch (error) {
       console.error("Error liking the movie:", error);
     }
-  }, [apiUrl, movieId, user]);
+  }, [apiUrl, movieId, user, isAuthenticated, navigate, location]);
 
   if (isLoading || !selectedMovie || !isPaymentStatusLoaded) {
     return <div>Loading...</div>;
@@ -362,17 +385,49 @@ const DetailPage = memo(() => {
                             role="tabpanel"
                             aria-labelledby="nav-review-tab"
                           >
-                            <div className="cast-list">
-                              {castMembers.map((person, index) => (
-                                <div key={index} className="cast-item">
-                                  <img
-                                    src={person.image_url}
-                                    alt={person.name}
-                                    className="cast-image"
-                                  />
-                                  <p>{person.name || "Loading..."}</p>
-                                </div>
-                              ))}
+                            <div className="cast-slider-container">
+                              <Swiper
+                                modules={[Navigation, Thumbs]}
+                                navigation={{
+                                  prevEl: ".cast-prev",
+                                  nextEl: ".cast-next",
+                                }}
+                                spaceBetween={16}
+                                watchOverflow={true}
+                                observer={true}
+                                observeParents={true}
+                                breakpoints={{
+                                  0: {
+                                    slidesPerView: 2,
+                                    slidesPerGroup: 2,
+                                  },
+                                  768: {
+                                    slidesPerView: 4,
+                                    slidesPerGroup: 2,
+                                  },
+                                  1025: {
+                                    slidesPerView: 6,
+                                    slidesPerGroup: 3,
+                                  },
+                                }}
+                                className="cast-swiper"
+                              >
+                                {castMembers.map((data, index) => (
+                                  <SwiperSlide key={index}>
+                                    <CastCard
+                                      image_url={data.image_url}
+                                      name={data.name}
+                                      role={data.role}
+                                    />
+                                  </SwiperSlide>
+                                ))}
+                              </Swiper>
+                              <div className="cast-prev swiper-button">
+                                <i className="fa fa-chevron-left"></i>
+                              </div>
+                              <div className="cast-next swiper-button">
+                                <i className="fa fa-chevron-right"></i>
+                              </div>
                             </div>
                           </Tab.Pane>
                           <Tab.Pane
@@ -382,18 +437,49 @@ const DetailPage = memo(() => {
                             role="tabpanel"
                             aria-labelledby="nav-review-tab"
                           >
-                            <div className="cast-list">
-                              {crewMembers.map((person, index) => (
-                                <div key={index} className="cast-item">
-                                  <h5>{person.role}</h5>
-                                  <img
-                                    src={person.image_url}
-                                    alt={person.name}
-                                    className="cast-image"
-                                  />
-                                  <p>{person.name || "Loading..."}</p>
-                                </div>
-                              ))}
+                            <div className="cast-slider-container">
+                              <Swiper
+                                modules={[Navigation, Thumbs]}
+                                navigation={{
+                                  prevEl: ".crew-prev",
+                                  nextEl: ".crew-next",
+                                }}
+                                spaceBetween={16}
+                                watchOverflow={true}
+                                observer={true}
+                                observeParents={true}
+                                breakpoints={{
+                                  0: {
+                                    slidesPerView: 2,
+                                    slidesPerGroup: 2,
+                                  },
+                                  768: {
+                                    slidesPerView: 4,
+                                    slidesPerGroup: 2,
+                                  },
+                                  1025: {
+                                    slidesPerView: 6,
+                                    slidesPerGroup: 3,
+                                  },
+                                }}
+                                className="cast-swiper"
+                              >
+                                {crewMembers.map((data, index) => (
+                                  <SwiperSlide key={index}>
+                                    <CastCard
+                                      image_url={data.image_url}
+                                      name={data.name}
+                                      role={data.role}
+                                    />
+                                  </SwiperSlide>
+                                ))}
+                              </Swiper>
+                              <div className="crew-prev swiper-button">
+                                <i className="fa fa-chevron-left"></i>
+                              </div>
+                              <div className="crew-next swiper-button">
+                                <i className="fa fa-chevron-right"></i>
+                              </div>
                             </div>
                           </Tab.Pane>
                         </Tab.Content>

@@ -1,11 +1,11 @@
 import { memo, Fragment, Suspense, useState, useEffect } from "react";
+import "./FrontendLayout.css";
 
 // reacr-router
 import { Outlet, Link } from "react-router-dom";
 
 // header
 import HeaderDefault from "../components/partials/HeaderDefault";
-import SidebarDefault from "../components/partials/SidebarDefault";
 import HeaderMerchandise from "../components/merchandise/partials/HeaderDefault";
 
 // footer
@@ -14,6 +14,7 @@ import MerchandiseFooter from "../components/merchandise/partials/FooterDefault"
 import Loader from "../components/Loader";
 //seetingoffCanvas
 import SettingOffCanvas from "../components/setting/SettingOffCanvas";
+
 const FrontendLayout = memo((props) => {
   const [animationClass, setAnimationClass] = useState("animate__fadeIn");
 
@@ -39,21 +40,15 @@ const FrontendLayout = memo((props) => {
 
   return (
     <Fragment>
-      {/* <Loader></Loader> */}
-      <main className="main-content">
-        {props.HeaderMega === "true" && <SidebarDefault></SidebarDefault>}
-        {props.HeaderMerchandise === "true" && (
-          <HeaderMerchandise></HeaderMerchandise>
-        )}
-        <Suspense fallback={<Loader></Loader>}>
-          <Outlet></Outlet>
-        </Suspense>
-      </main>
-      {/* {props.FooterMerchandise === "true" && location.pathname !== "/shop" ? (
-        <MerchandiseFooter />
-      ) : (
-        <FooterDefault />
-      )} */}
+      <div className="header-layout">
+        {props.HeaderMega === "true" && <HeaderDefault />}
+        {props.HeaderMerchandise === "true" && <HeaderMerchandise />}
+        <div className="content-wrapper">
+          <Suspense fallback={<Loader />}>
+            <Outlet />
+          </Suspense>
+        </div>
+      </div>
       <div
         id="back-to-top"
         style={{ display: "none" }}

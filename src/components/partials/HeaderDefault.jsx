@@ -27,6 +27,8 @@ import CustomToggle from "../CustomToggle";
 
 // the hook
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../context/AuthContext";
+import { logout } from "../../utilities/authUtils";
 
 // img
 import user from "/assets/images/user/user1.webp";
@@ -37,6 +39,8 @@ const HeaderDefault = memo(() => {
   const [isMega, setIsMega] = useState(true);
   const location = useLocation();
   const apiUrl = import.meta.env.VITE_API_URL;
+  const navigate = useNavigate();
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
 
   //for translation
   const { t, i18n } = useTranslation();
@@ -104,41 +108,15 @@ const HeaderDefault = memo(() => {
     };
   }, []);
 
-  const navigate = useNavigate();
-
-  const logout = () => {
-    fetch(`${apiUrl}/logout`, {
-      method: "GET",
-      credentials: "include", // Include the session cookie with the request
-    })
-      .then((response) => {
-        // Check if the response is JSON
-        const contentType = response.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-          console.error("Expected JSON response but received:", contentType);
-          throw new Error("Expected JSON response");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Parsed JSON response:", data);
-
-        if (data.message === "Logged out successfully") {
-          // Clear user data from state
-          dispatch(setUser(null));
-          console.log("Logged out successfully");
-
-          // Redirect to the login page
-          navigate("/login");
-        } else {
-          // Handle any errors
-          console.error("Logout error message:", data.message);
-        }
-      })
-      .catch((error) => {
-        // Handle any network errors
-        console.error("An error occurred while logging out:", error);
-      });
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setIsAuthenticated(false);
+      dispatch(setUser(null));
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   return (
@@ -239,7 +217,9 @@ const HeaderDefault = memo(() => {
                           location.pathname === "/about-us" ||
                           location.pathname === "/contact-us" ||
                           location.pathname === "/faq" ||
-                          location.pathname === "/PrivacyPolicy" ||
+                          location.pathname === "/privacy-policy" ||
+                          location.pathname === "/terms-of-use" ||
+                          location.pathname === "/cancellation-refund" ||
                           location.pathname === "/pricing" ||
                           location.pathname === "/coming-soon"
                             ? "active"
@@ -290,6 +270,45 @@ const HeaderDefault = memo(() => {
                             >
                               {" "}
                               {t("header.contact_us")}{" "}
+                            </Link>
+                          </Nav.Item>
+                          <Nav.Item as="li">
+                            <Link
+                              to="/privacy-policy"
+                              className={`${
+                                location.pathname === "/privacy-policy"
+                                  ? "active"
+                                  : ""
+                              } nav-link`}
+                            >
+                              {" "}
+                              Privacy Policy{" "}
+                            </Link>
+                          </Nav.Item>
+                          <Nav.Item as="li">
+                            <Link
+                              to="/terms-of-use"
+                              className={`${
+                                location.pathname === "/terms-of-use"
+                                  ? "active"
+                                  : ""
+                              } nav-link`}
+                            >
+                              {" "}
+                              Terms of Use{" "}
+                            </Link>
+                          </Nav.Item>
+                          <Nav.Item as="li">
+                            <Link
+                              to="/cancellation-refund"
+                              className={`${
+                                location.pathname === "/cancellation-refund"
+                                  ? "active"
+                                  : ""
+                              } nav-link`}
+                            >
+                              {" "}
+                              Cancellation & Refund{" "}
                             </Link>
                           </Nav.Item>
                           <Nav.Item as="li">
@@ -611,7 +630,7 @@ const HeaderDefault = memo(() => {
                         </Dropdown.Item>
                       </Dropdown.Menu>
                     </Dropdown>
-                    {loggedIn ? (
+                    {isAuthenticated ? (
                       <Dropdown as="li" className="nav-item">
                         <Dropdown.Toggle
                           as={CustomToggle}
@@ -771,7 +790,7 @@ const HeaderDefault = memo(() => {
                           <li>
                             <Link
                               className="iq-sub-card iq-logout-2 mt-1 d-flex justify-content-center gap-2"
-                              onClick={logout}
+                              onClick={handleLogout}
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -791,8 +810,8 @@ const HeaderDefault = memo(() => {
                       </Dropdown>
                     ) : (
                       <li>
-                        <Link to="/login">
-                          <i className="fas fa-user"></i> Login
+                        <Link to="/login" className="nav-link">
+                          <i className="fas fa-user"></i> {t("header.login")}
                         </Link>
                       </li>
                     )}

@@ -1,55 +1,279 @@
-.login-container {
-  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("https://i.ibb.co/tYNkWWq/v-Rs0-PSJL-1.jpg");
-  background-size: cover;
-  background-position: center;
+.login-page {
   min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  font-family: "Inter", sans-serif;
 }
 
-.login-card {
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 10px;
-  padding: 2rem;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  backdrop-filter: blur(4px);
+.login-container {
   width: 100%;
-  max-width: 400px;
-  height: 400px;
+  max-width: 1200px;
+  min-height: 600px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  display: flex;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Left Column Styles */
+.login-left {
+  flex: 1;
+  background: linear-gradient(45deg, #5f172c 0%, #150137 100%);
+  padding: 4rem;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center horizontally */
+  text-align: center; /* Center text content */
+}
+
+.login-left::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("/path-to-your-pattern.svg") center/cover;
+  opacity: 0.1;
+}
+
+.login-left-content {
+  position: relative;
+  z-index: 1;
+  color: white;
   display: flex;
   flex-direction: column;
+  align-items: center; /* Center all content */
+  justify-content: center;
+  max-width: 400px; /* Limit content width for better readability */
+}
+
+.large-logo {
+  width: 180px;
+  margin-bottom: 2rem;
+}
+
+.welcome-text {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(to right, #fff, #e0e7ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+}
+
+.tagline {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.features {
+  display: flex;
+  gap: 2rem;
+  margin-top: 3rem;
+  justify-content: center; /* Center feature items */
+  width: 100%;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.feature-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.feature-text {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Right Column Styles */
+.login-right {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center all form content */
+  text-align: center;
 }
 
 .login-title {
   font-size: 2rem;
-  color: #ffffff;
-  margin-bottom: 1rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.5rem;
   text-align: center;
 }
 
 .login-subtitle {
-  font-size: 1rem;
-  color: #cccccc;
+  color: rgba(255, 255, 255, 0.6);
   margin-bottom: 2rem;
   text-align: center;
 }
 
-.google-login-wrapper {
+.auth-buttons {
   display: flex;
-  justify-content: center;
-  margin-bottom: 1rem;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  width: 100%;
+  align-items: center;
 }
 
-.logo {
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding: 20px;
+/* Target the Google button container */
+.auth-button.google {
+  width: 320px !important;
+  display: flex !important;
+  justify-content: center !important;
 }
 
-.facebook-login-wrapper {
+/* Target the Google button iframe container */
+.auth-button.google > div {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+/* Target the Google button iframe itself */
+.auth-button.google iframe {
+  margin: 0 auto !important;
+}
+
+/* Override any Google-injected styles */
+.auth-button.google div[style*="text-align: left"] {
+  text-align: center !important;
+}
+
+.auth-button.google div[style*="margin-left"] {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Force center alignment for the button content */
+.auth-button.google button,
+.auth-button.google > div > div {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin: 0 auto !important;
+}
+
+.auth-button {
+  width: 100%;
+  max-width: 320px; /* Limit button width */
+}
+
+.facebook-button {
+  width: 100%;
+  max-width: 320px; /* Match Google button width */
+  padding: 12px;
+  border-radius: 4px;
+  background: #1877f2;
+  color: white;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
   display: flex;
+  align-items: center;
   justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.facebook-button:hover {
+  background: #166fe5;
+}
+
+.facebook-icon {
+  font-size: 1.2rem;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.terms-text {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
+
+.terms-text a {
+  color: #4f46e5;
+  text-decoration: none;
+}
+
+.terms-text a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+  .login-container {
+    flex-direction: column;
+  }
+
+  .login-left,
+  .login-right {
+    padding: 2rem;
+  }
+
+  .features {
+    gap: 1rem;
+  }
+
+  .welcome-text {
+    font-size: 2rem;
+  }
+
+  .login-left-content,
+  .login-form-container {
+    max-width: 100%; /* Full width on mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .login-page {
+    padding: 1rem;
+  }
+
+  .features {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .auth-button,
+  .facebook-button {
+    max-width: 100%; /* Full width on smaller screens */
+  }
 }
