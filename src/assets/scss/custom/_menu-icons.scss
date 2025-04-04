@@ -1,0 +1,46 @@
+// Fix for menu icons alignment
+
+// Better icon alignment in nav items
+.navbar-nav .nav-link {
+  display: flex;
+  align-items: center;
+  
+  .menu-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    width: 24px;
+    height: 24px;
+    
+    svg {
+      font-size: 18px;
+    }
+  }
+  
+  .item-name {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+  }
+}
+
+// Special styling for mobile view to ensure better spacing
+@media (max-width: 1199.98px) {
+  .navbar-nav .nav-link {
+    padding: 0.75rem 1rem;
+    
+    .menu-icon-wrapper {
+      margin-right: 15px;
+      
+      svg {
+        font-size: 20px;
+      }
+    }
+  }
+}
+
+// Ensure consistent spacing
+.me-2 {
+  margin-right: 0.625rem !important;
+}

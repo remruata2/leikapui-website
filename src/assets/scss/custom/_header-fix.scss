@@ -1,0 +1,20 @@
+// Fix for close button in desktop view
+@media (min-width: 1200px) {
+  // Hide close button on desktop
+  .offcanvas-header .btn-close {
+    display: none !important;
+  }
+}
+
+// Ensure mobile toggle container is visible
+.mobile-toggle-container {
+  display: flex !important;
+  position: fixed;
+  z-index: 1060;
+  left: 20px;
+  top: 20px;
+  
+  @media (min-width: 1200px) {
+    display: none !important;
+  }
+}

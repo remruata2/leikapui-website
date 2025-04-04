@@ -46,6 +46,8 @@ const FrontendLayout = memo((props) => {
             <Outlet />
           </Suspense>
         </div>
+        {/* Add Footer Component */}
+        <FooterDefault />
       </div>
       <div
         id="back-to-top"

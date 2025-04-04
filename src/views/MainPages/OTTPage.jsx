@@ -4,10 +4,10 @@ import OttHeroSlider from "../../components/slider/OttHeroSlider";
 
 // sections
 import PopularMovies from "../../components/sections/PopularMovies";
-import TvShowsSlider from "../../components/sections/TvShowsSlider";
+// import TvShowsSlider from "../../components/sections/TvShowsSlider";
 
 //static data
-import { ottVerticleLatestMovies } from "../../StaticData/data";
+// import { ottVerticleLatestMovies } from "../../StaticData/data";
 
 console.log("Test OttPage renders");
 const HomePage = memo(() => {
@@ -15,7 +15,7 @@ const HomePage = memo(() => {
     <Fragment>
       <OttHeroSlider />
       <PopularMovies paddingY="my-4" />
-      <TvShowsSlider />
+      {/* <TvShowsSlider /> */}
     </Fragment>
   );
 });

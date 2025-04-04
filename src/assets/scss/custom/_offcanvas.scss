@@ -1,0 +1,31 @@
+// Custom offcanvas styles
+
+// Hide close button on desktop view
+@media (min-width: 1200px) {
+	.offcanvas-header .btn-close {
+		display: none !important;
+	}
+}
+
+// Style the offcanvas menu
+@media (max-width: 768px) {
+	.offcanvas {
+		max-width: 300px;
+
+		.offcanvas-header {
+			padding: 1rem;
+
+			.btn-close {
+				position: absolute;
+				right: 15px;
+				top: 15px;
+			}
+		}
+	}
+}
+
+// Add smooth transition for elements
+.offcanvas,
+.offcanvas-backdrop {
+	transition: transform 0.3s ease, opacity 0.3s ease;
+}

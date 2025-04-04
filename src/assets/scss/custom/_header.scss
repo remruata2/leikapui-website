@@ -1,0 +1,110 @@
+// Custom header styles
+
+.mobile-toggle-container {
+	position: relative;
+	z-index: 1060; // Ensure it's above other content
+	display: flex !important; // Force display
+	align-items: center;
+	margin-right: 1rem;
+	left: 50px;
+	top: 80px;
+
+	// Only hide on desktop, ensure it's visible on mobile
+	@media (min-width: 1200px) {
+		display: none !important;
+	}
+}
+
+// When offcanvas is shown, adjust positioning
+.offcanvas.show ~ .mobile-toggle-container,
+.mobile-toggle-container.menu-open {
+	position: fixed;
+	top: 15px;
+	left: 15px;
+	z-index: 1070;
+	transition: all 0.3s ease;
+}
+
+// Toggle button styling
+.toggle-rounded-btn {
+	width: 50px;
+	height: 50px;
+	min-width: 50px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background-color: var(--bs-primary) !important;
+	transition: background-color 0.2s ease, transform 0.2s ease;
+	border: none;
+	outline: none;
+	padding: 0;
+	margin: 0;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+
+	&:hover {
+		background-color: darken(#7016d0, 10%) !important;
+		transform: scale(1.05);
+	}
+
+	svg {
+		transition: transform 0.3s ease;
+		width: 40px;
+		height: 40px;
+	}
+
+	// Rotate icon when menu is open
+	.menu-open & svg {
+		transform: rotate(180deg);
+	}
+}
+
+// Make sure navbar logo is aligned properly
+.navbar-brand {
+	margin-right: 0;
+}
+
+// Ensure the offcanvas header is properly spaced
+.offcanvas-header {
+	padding: 1rem;
+
+	.btn-close {
+		position: absolute;
+		right: 15px;
+		top: 15px;
+	}
+}
+
+// Ensure clicking outside the menu will close it
+.offcanvas-backdrop {
+	cursor: pointer;
+}
+
+// Mobile styling
+@media (max-width: 1199.98px) {
+	// Mobile specific adjustments
+	.header-center-home {
+		.landing-header {
+			position: relative;
+
+			// Make sure the logo is centered on mobile
+			.d-flex.align-items-center.justify-content-center {
+				position: relative;
+			}
+		}
+
+		.navbar-brand {
+			margin: 0 auto;
+			text-align: center;
+		}
+	}
+
+	// Ensure the offcanvas slides in properly
+	.mobile-offcanvas.offcanvas {
+		transition: transform 0.3s ease-in-out;
+
+		&.show {
+			transform: none;
+		}
+	}
+}

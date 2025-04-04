@@ -1,4 +1,4 @@
-import { memo, Fragment, useState, useEffect } from "react";
+import { memo, Fragment, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { setUser } from "../../store/user/actions";
 
@@ -23,14 +23,22 @@ import { theme_scheme_direction } from "../../store/setting/actions";
 
 // components
 import Logo from "../logo";
-import CustomToggle from "../CustomToggle";
+
+// icons
+import {
+  FaUser,
+  FaShoppingCart,
+  FaSignOutAlt,
+  FaDesktop,
+  FaTv,
+  FaFilm,
+  FaSignInAlt,
+} from "react-icons/fa";
 
 // the hook
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/AuthContext";
 import { logout } from "../../utilities/authUtils";
-
-import { useRef } from "react";
 
 const HeaderDefault = memo((props) => {
   const dispatch = useDispatch();
@@ -39,6 +47,7 @@ const HeaderDefault = memo((props) => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+  const offcanvasRef = useRef(null);
 
   //for translation
   const { t, i18n } = useTranslation();
@@ -56,7 +65,6 @@ const HeaderDefault = memo((props) => {
   const [show1, setShow1] = useState(false);
   const [show2, setShow2] = useState(false);
 
-  const [open2, setOpen2] = useState(false);
   const [open3, setOpen3] = useState(false);
 
   useEffect(() => {
@@ -70,7 +78,7 @@ const HeaderDefault = memo((props) => {
     try {
       await logout();
       // Force a re-render by dispatching an auth change event
-      window.dispatchEvent(new Event('authChange'));
+      window.dispatchEvent(new Event("authChange"));
       navigate("/login");
     } catch (error) {
       console.error("Logout error:", error);
@@ -93,43 +101,88 @@ const HeaderDefault = memo((props) => {
       setIsMega(location.pathname === "/");
     };
 
+    // Close the offcanvas when clicking outside of it
+    const handleOutsideClick = (event) => {
+      if (
+        show1 &&
+        offcanvasRef.current &&
+        !offcanvasRef.current.contains(event.target)
+      ) {
+        // Check if the click is not on the toggle button (which has its own handler)
+        const toggleBtn = document.querySelector(".toggle-rounded-btn");
+        if (!toggleBtn.contains(event.target)) {
+          setShow1(false);
+        }
+      }
+    };
+
     window.addEventListener("scroll", handleScroll);
+    document.addEventListener("mousedown", handleOutsideClick);
     updateIsMega();
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, []);
+  }, [show1]);
 
   return (
     <Fragment>
       <header className="header-center-home header-default header-sticky">
+        {/* Mobile Menu Toggle Button - Leftmost position */}
+        <div
+          className={`d-xl-none mobile-toggle-container ${
+            show1 ? "menu-open" : ""
+          }`}
+        >
+          <button
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#navbar_main"
+            aria-controls="navbar_main"
+            className="btn btn-primary rounded-pill p-1 pt-0 toggle-rounded-btn"
+            onClick={() => setShow1(!show1)}
+          >
+            {show1 ? (
+              <svg
+                width="40px"
+                height="40px"
+                className="icon-40"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill="currentColor"
+                  d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
+                ></path>
+              </svg>
+            ) : (
+              <svg
+                width="40px"
+                height="40px"
+                className="icon-40"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill="currentColor"
+                  d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"
+                ></path>
+              </svg>
+            )}
+          </button>
+        </div>
+
         <Navbar
           expand="xl"
           className="nav navbar-light iq-navbar header-hover-menu py-xl-0"
         >
           <Container fluid className="navbar-inner">
             <div className="d-flex align-items-center justify-content-between w-100 landing-header">
-              <div className="d-flex align-items-center justify-content-center flex-grow-1 flex-xl-grow-0">
-                <div className="d-xl-none">
-                  <button
-                    type="button"
-                    data-bs-toggle="offcanvas"
-                    data-bs-target="#navbar_main"
-                    aria-controls="navbar_main"
-                    className="btn btn-primary rounded-pill p-1 pt-0 toggle-rounded-btn me-3"
-                    onClick={() => setShow1(!show1)}
-                  >
-                    <svg width="20px" className="icon-20" viewBox="0 0 24 24">
-                      <path
-                        fill="currentColor"
-                        d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"
-                      ></path>
-                    </svg>
-                  </button>
-                </div>
+              {/* Logo Container - Centered on mobile, left on desktop */}
+              <div className="d-flex align-items-center justify-content-center flex-grow-1 flex-md-grow-0">
                 <Logo></Logo>
               </div>
+
+              {/* Navbar/Offcanvas */}
               <Navbar
                 expand="xl"
                 className={`offcanvas mobile-offcanvas nav hover-nav horizontal-nav py-xl-0 ${
@@ -142,14 +195,10 @@ const HeaderDefault = memo((props) => {
               >
                 <Container fluid className="container-fluid p-lg-0">
                   <Offcanvas.Header
-                    className="px-0 pt-0"
+                    className="px-0 pt-0 d-flex align-items-center"
                     closeButton
                     onHide={() => setShow1(false)}
-                  >
-                    <div className="navbar-brand d-flex justify-content-center w-100">
-                      <Logo></Logo>
-                    </div>
-                  </Offcanvas.Header>
+                  ></Offcanvas.Header>
                   <ul
                     className="navbar-nav iq-nav-menu list-unstyled"
                     id="header-menu"
@@ -159,23 +208,18 @@ const HeaderDefault = memo((props) => {
                         as={Link}
                         to="/"
                         className={`${
-                          location.pathname === "/" ? "active" : ""
+                          location.pathname === "/" ||
+                          location.pathname === "/dashboard" ||
+                          location.pathname === "/home" ||
+                          location.pathname === "/movie"
+                            ? "active"
+                            : ""
                         }`}
                         onClick={() => setShow1(false)}
                       >
-                        <span className="item-name">{t("header.home")}</span>
-                      </Nav.Link>
-                    </Nav.Item>
-
-                    <Nav.Item as="li">
-                      <Nav.Link
-                        as={Link}
-                        to="/movies"
-                        className={`${
-                          location.pathname === "/movies" ? "active" : ""
-                        }`}
-                        onClick={() => setShow1(false)}
-                      >
+                        <div className="menu-icon-wrapper">
+                          <FaFilm />
+                        </div>
                         <span className="item-name">{t("header.movie")}</span>
                       </Nav.Link>
                     </Nav.Item>
@@ -188,151 +232,76 @@ const HeaderDefault = memo((props) => {
                         }`}
                         onClick={() => setShow1(false)}
                       >
+                        <div className="menu-icon-wrapper">
+                          <FaTv />
+                        </div>
                         <span className="item-name">{t("Series")}</span>
                       </Nav.Link>
                     </Nav.Item>
-                    <Nav.Item as="li">
-                      <Nav.Link
-                        aria-expanded={open2}
-                        href="#"
-                        onClick={() => setOpen2(!open2)}
-                        className={`${
-                          location.pathname === "/contact-us" ||
-                          location.pathname === "/privacy-policy" ||
-                          location.pathname === "/terms-of-use" ||
-                          location.pathname === "/cancellation-refund"
-                            ? "active"
-                            : ""
-                        }`}
-                      >
-                        <span className="item-name">{t("header.pages")}</span>
-                        <span className="menu-icon ms-2">
-                          <i
-                            className={`fa ${
-                              open2 ? "fa-caret-up" : "fa-caret-down"
-                            } toggledrop-desktop right-icon`}
-                            aria-hidden="true"
-                          ></i>
-                        </span>
-                      </Nav.Link>
-                      <Collapse in={open2} className="sub-nav list-unstyled">
-                        <ul>
-                          <Nav.Item as="li">
-                            <Link
-                              to="/contact-us"
-                              className={`${
-                                location.pathname === "/contact-us"
-                                  ? "active"
-                                  : ""
-                              } nav-link`}
-                              onClick={() => setShow1(false)}
-                            >
-                              Contact Us
-                            </Link>
-                          </Nav.Item>
-                          <Nav.Item as="li">
-                            <Link
-                              to="/privacy-policy"
-                              className={`${
-                                location.pathname === "/privacy-policy"
-                                  ? "active"
-                                  : ""
-                              } nav-link`}
-                              onClick={() => setShow1(false)}
-                            >
-                              Privacy Policy
-                            </Link>
-                          </Nav.Item>
-                          <Nav.Item as="li">
-                            <Link
-                              to="/terms-of-use"
-                              className={`${
-                                location.pathname === "/terms-of-use"
-                                  ? "active"
-                                  : ""
-                              } nav-link`}
-                              onClick={() => setShow1(false)}
-                            >
-                              Terms of Use
-                            </Link>
-                          </Nav.Item>
-                          <Nav.Item as="li">
-                            <Link
-                              to="/cancellation-refund"
-                              className={`${
-                                location.pathname === "/cancellation-refund"
-                                  ? "active"
-                                  : ""
-                              } nav-link`}
-                              onClick={() => setShow1(false)}
-                            >
-                              Cancellation & Refund
-                            </Link>
-                          </Nav.Item>
-                        </ul>
-                      </Collapse>
-                    </Nav.Item>
                     {isAuthenticated ? (
-                      <Nav.Item as="li">
-                        <Nav.Link
-                          aria-expanded={open3}
-                          href="#"
-                          onClick={() => setOpen3(!open3)}
-                        >
-                          <span className="item-name">My Account</span>
-                          <span className="menu-icon ms-2">
-                            <i
-                              className={`fa ${
-                                open3 ? "fa-caret-up" : "fa-caret-down"
-                              } toggledrop-desktop right-icon`}
-                              aria-hidden="true"
-                            ></i>
-                          </span>
-                        </Nav.Link>
-                        <Collapse in={open3} className="sub-nav list-unstyled">
-                          <ul>
-                            <Nav.Item as="li">
-                              <Link
-                                to="/profile"
-                                className="nav-link"
-                                onClick={() => setShow1(false)}
-                              >
-                                Profile
-                              </Link>
-                            </Nav.Item>
-                            <Nav.Item as="li">
-                              <Link
-                                to="/devices"
-                                className="nav-link"
-                                onClick={() => setShow1(false)}
-                              >
-                                Devices
-                              </Link>
-                            </Nav.Item>
-                            <Nav.Item as="li">
-                              <Link
-                                to="/purchases"
-                                className="nav-link"
-                                onClick={() => setShow1(false)}
-                              >
-                                Purchases
-                              </Link>
-                            </Nav.Item>
-                            <Nav.Item as="li">
-                              <Link
-                                to="#"
-                                className="nav-link"
-                                onClick={() => {
-                                  handleLogout();
-                                  setShow1(false);
-                                }}
-                              >
-                                Logout
-                              </Link>
-                            </Nav.Item>
-                          </ul>
-                        </Collapse>
-                      </Nav.Item>
+                      <>
+                        <Nav.Item as="li">
+                          <Nav.Link
+                            as={Link}
+                            to="/profile"
+                            className={`${
+                              location.pathname === "/profile" ? "active" : ""
+                            }`}
+                            onClick={() => setShow1(false)}
+                          >
+                            <div className="menu-icon-wrapper">
+                              <FaUser />
+                            </div>
+                            <span className="item-name">Profile</span>
+                          </Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item as="li">
+                          <Nav.Link
+                            as={Link}
+                            to="/purchases"
+                            className={`${
+                              location.pathname === "/purchases" ? "active" : ""
+                            }`}
+                            onClick={() => setShow1(false)}
+                          >
+                            <div className="menu-icon-wrapper">
+                              <FaShoppingCart />
+                            </div>
+                            <span className="item-name">Purchases</span>
+                          </Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item as="li">
+                          <Nav.Link
+                            as={Link}
+                            to="/devices"
+                            className={`${
+                              location.pathname === "/devices" ? "active" : ""
+                            }`}
+                            onClick={() => setShow1(false)}
+                          >
+                            <div className="menu-icon-wrapper">
+                              <FaDesktop />
+                            </div>
+                            <span className="item-name">Devices</span>
+                          </Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item as="li">
+                          <Nav.Link
+                            as={Link}
+                            to="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleLogout();
+                              setShow1(false);
+                            }}
+                          >
+                            <div className="menu-icon-wrapper">
+                              <FaSignOutAlt />
+                            </div>
+                            <span className="item-name">Logout</span>
+                          </Nav.Link>
+                        </Nav.Item>
+                      </>
                     ) : (
                       <Nav.Item as="li">
                         <Nav.Link
@@ -343,217 +312,16 @@ const HeaderDefault = memo((props) => {
                           }`}
                           onClick={() => setShow1(false)}
                         >
-                          <span className="item-name">
-                            <i className="fas fa-user"></i> {t("header.login")}
-                          </span>
+                          <div className="menu-icon-wrapper">
+                            <FaSignInAlt />
+                          </div>
+                          <span className="item-name">{t("Login")}</span>
                         </Nav.Link>
                       </Nav.Item>
                     )}
                   </ul>
                 </Container>
               </Navbar>
-
-              {/* <div className="right-panel">
-                <Button
-                  id="navbar-toggle"
-                  bsPrefix="navbar-toggler"
-                  type="button"
-                  aria-expanded={show}
-                  data-bs-toggle="collapse"
-                  data-bs-target="#navbarSupportedContent"
-                  onClick={() => setShow(!show)}
-                >
-                  <span className="navbar-toggler-btn">
-                    <span className="navbar-toggler-icon"></span>
-                  </span>
-                </Button>
-                <div
-                  className={`navbar-collapse collapse ${show ? "show" : ""}`}
-                  id="navbarSupportedContent"
-                >
-                  <ul className="navbar-nav align-items-center ms-auto mb-2 mb-xl-0 gap-3">
-                    <Dropdown
-                      as="li"
-                      className="nav-item dropdown iq-responsive-menu"
-                    >
-                      <div className="search-box">
-                        <Link
-                          to="#"
-                          onClick={() => setShow2(!show2)}
-                          className={` nav-link p-0 ${show2 ? "show" : ""}`}
-                          id="search-drop"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                        >
-                          <div className="btn-icon btn-sm rounded-pill btn-action">
-                            <span className="btn-inner">
-                              <svg
-                                className="icon-20"
-                                width="20"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <circle
-                                  cx="11.7669"
-                                  cy="11.7666"
-                                  r="8.98856"
-                                  stroke="currentColor"
-                                  strokeWidth="1.5"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                ></circle>
-                                <path
-                                  d="M18.0186 18.4851L21.5426 22"
-                                  stroke="currentColor"
-                                  strokeWidth="1.5"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                ></path>
-                              </svg>
-                            </span>
-                          </div>
-                        </Link>
-                        <ul
-                          className={`dropdown-menu p-0 dropdown-search m-0 iq-search-bar ${
-                            show2 ? "show" : ""
-                          }`}
-                          style={{ width: "10rem" }}
-                          data-bs-popper="static"
-                        >
-                          <li className="p-0">
-                            <div className="form-group input-group mb-0">
-                              <input
-                                type="text"
-                                className="form-control border-0"
-                                placeholder={t("blogs.search")}
-                              />
-                              <button
-                                onClick={() => setShow2(!show2)}
-                                type="submit"
-                                className={` search-submit ${
-                                  show === false ? "show" : ""
-                                }`}
-                              >
-                                <svg
-                                  className="icon-15"
-                                  width="15"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <circle
-                                    cx="11.7669"
-                                    cy="11.7666"
-                                    r="8.98856"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  ></circle>
-                                  <path
-                                    d="M18.0186 18.4851L21.5426 22"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  ></path>
-                                </svg>
-                              </button>
-                            </div>
-                          </li>
-                        </ul>
-                        <Dropdown.Menu
-                          as="ul"
-                          className="p-0 dropdown-search m-0 iq-search-bar"
-                          style={{ width: "20rem" }}
-                        >
-                          <li className="p-0">
-                            <div className="form-group input-group mb-0">
-                              <input
-                                type="text"
-                                className="form-control border-0"
-                                placeholder="t('header.search_dot')"
-                              />
-                              <button type="submit" className="search-submit">
-                                <svg
-                                  className="icon-15"
-                                  width="15"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <circle
-                                    cx="11.7669"
-                                    cy="11.7666"
-                                    r="8.98856"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  ></circle>
-                                  <path
-                                    d="M18.0186 18.4851L21.5426 22"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  ></path>
-                                </svg>
-                              </button>
-                            </div>
-                          </li>
-                        </Dropdown.Menu>
-                      </div>
-                    </Dropdown>
-                    <Dropdown as="li" className="nav-items">
-                      <Dropdown.Toggle
-                        as={CustomToggle}
-                        href="#"
-                        variant=" nav-link d-flex align-items-center px-0"
-                        id="langDropdown"
-                      >
-                        <i className="fa-solid fa-language" size="md"></i>
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu
-                        as="ul"
-                        className="dropdown-menu-end border-0 p-0 m-0"
-                      >
-                        <Dropdown.Item
-                          to="#"
-                          onClick={() => changeLanguage("en")}
-                        >
-                          en
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                          to="#"
-                          onClick={() => changeLanguage("ar")}
-                        >
-                          ar
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                          to="#"
-                          onClick={() => changeLanguage("de")}
-                        >
-                          de
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                          to="#"
-                          onClick={() => changeLanguage("fr")}
-                        >
-                          fr
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                          to="#"
-                          onClick={() => changeLanguage("gr")}
-                        >
-                          gr
-                        </Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </ul>
-                </div>
-              </div> */}
             </div>
           </Container>
         </Navbar>

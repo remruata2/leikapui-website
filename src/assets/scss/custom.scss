@@ -37,6 +37,12 @@
 // Pages
 @import "./custom/pages/index";
 
+// Header
+@import "./custom/header";
+
+// Footer
+@import "./custom/footer";
+
 // Plugin
 @import "./streamit-design-system/plugins/prism";
 
@@ -49,3 +55,5 @@
     box-shadow: none;
   }
 }
+@import "./custom/offcanvas";
+@import "./custom/menu-icons";
