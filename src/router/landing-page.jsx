@@ -118,11 +118,7 @@ export const LandingpageRouter = [
       },
       {
         path: "/movies-detail/:id",
-        element: (
-          <ProtectedRoute>
-            <MovieDetail />
-          </ProtectedRoute>
-        ),
+        element: <MovieDetail />,
       },
       {
         path: "/tv-shows",

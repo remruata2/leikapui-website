@@ -27,7 +27,6 @@ const ContactUs = memo(() => {
 
   return (
     <Fragment>
-      <BreadCrumbWidget title="Contact Us" />
       <div className="section-padding contact-us">
         <Container>
           <div className="contact-header">
