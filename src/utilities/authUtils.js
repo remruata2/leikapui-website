@@ -2,6 +2,8 @@ import axios from "axios";
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
+const TOKEN_KEY = "jwtToken";
+const USER_DATA_KEY = "userData";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -31,24 +33,47 @@ export const getDeviceInfo = async () => {
   }
 };
 
-export const isAuthenticated = () => {
-  const token = localStorage.getItem("jwtToken");
-  if (!token) return false;
-
+export const validateToken = async () => {
   try {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) return false;
+
+    // Verify token expiry
     const tokenData = JSON.parse(atob(token.split(".")[1]));
     const expiryTime = tokenData.exp * 1000;
     const currentTime = Date.now();
 
-    // If token is expired, logout the user
+    // If token is within 1 hour of expiring, try to refresh it
+    if (expiryTime - currentTime < 3600000) {
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/auth/refresh-token`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (response.data.token) {
+          localStorage.setItem(TOKEN_KEY, response.data.token);
+          if (response.data.user) {
+            localStorage.setItem(USER_DATA_KEY, JSON.stringify(response.data.user));
+          }
+          axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
+          return true;
+        }
+      } catch (refreshError) {
+        console.error("Token refresh failed:", refreshError);
+      }
+    }
+
+    // Only invalidate if token is actually expired
     if (currentTime >= expiryTime) {
-      logout();
+      await logout();
       return false;
     }
 
     return true;
   } catch (error) {
     console.error("Error validating token:", error);
+    await logout();
     return false;
   }
 };
@@ -80,11 +105,9 @@ export const authenticateWithBackend = async (
       throw new Error(response.data.message || "Authentication failed");
     }
 
-    localStorage.setItem("jwtToken", response.data.token);
-    localStorage.setItem("userData", JSON.stringify(response.data.user));
-    axios.defaults.headers.common[
-      "Authorization"
-    ] = `Bearer ${response.data.token}`;
+    localStorage.setItem(TOKEN_KEY, response.data.token);
+    localStorage.setItem(USER_DATA_KEY, JSON.stringify(response.data.user));
+    axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
     axios.defaults.headers.common["Service"] = "leikapui-api";
 
     return response.data;
@@ -107,7 +130,7 @@ export const authenticateWithBackend = async (
 
 export const logout = async () => {
   try {
-    const token = localStorage.getItem("jwtToken");
+    const token = localStorage.getItem(TOKEN_KEY);
     if (!token) {
       // Already logged out
       return;
@@ -118,7 +141,10 @@ export const logout = async () => {
         `${import.meta.env.VITE_API_URL}/auth/logout`,
         {},
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            Service: "leikapui-api"
+          },
           timeout: 5000, // 5 second timeout
         }
       );
@@ -128,20 +154,34 @@ export const logout = async () => {
     }
   } finally {
     // Always clear local storage and headers
-    localStorage.removeItem("jwtToken");
-    localStorage.removeItem("userData");
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_DATA_KEY);
     delete axios.defaults.headers.common["Authorization"];
     delete axios.defaults.headers.common["Service"];
     window.dispatchEvent(new Event("authChange"));
   }
 };
 
+export const getUserData = () => {
+  try {
+    const userData = localStorage.getItem(USER_DATA_KEY);
+    if (userData) {
+      return JSON.parse(userData);
+    }
+    return null;
+  } catch (error) {
+    console.error('Error getting user data:', error);
+    return null;
+  }
+};
+
 // Set up axios interceptors
 axios.interceptors.request.use(
   async (config) => {
-    const token = localStorage.getItem("jwtToken");
+    const token = localStorage.getItem(TOKEN_KEY);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Service = "leikapui-api";
     }
     return config;
   },
@@ -151,9 +191,7 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   (response) => response,
   async (error) => {
-    // If we get a 401 error, it means the token is invalid or expired
     if (error.response?.status === 401) {
-      // Logout the user and redirect to login page
       await logout();
       window.location.href = "/login";
     }

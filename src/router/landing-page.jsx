@@ -122,27 +122,15 @@ export const LandingpageRouter = [
       },
       {
         path: "/tv-shows",
-        element: (
-          <ProtectedRoute>
-            <TvShowsList />
-          </ProtectedRoute>
-        ),
+        element: <TvShowsList />,
       },
       {
         path: "/shows-details/:id",
-        element: (
-          <ProtectedRoute>
-            <TvShowsDetail />
-          </ProtectedRoute>
-        ),
+        element: <TvShowsDetail />,
       },
       {
         path: "/episodes",
-        element: (
-          <ProtectedRoute>
-            <LatestEpisodes />
-          </ProtectedRoute>
-        ),
+        element: <LatestEpisodes />,
       },
       {
         path: "/videos",
@@ -154,11 +142,7 @@ export const LandingpageRouter = [
       },
       {
         path: "/videos-detail",
-        element: (
-          <ProtectedRoute>
-            <VideoDetail />
-          </ProtectedRoute>
-        ),
+        element: <VideoDetail />,
       },
       {
         path: "/restricted-content",

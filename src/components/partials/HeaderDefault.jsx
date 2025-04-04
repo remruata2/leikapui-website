@@ -30,17 +30,15 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/AuthContext";
 import { logout } from "../../utilities/authUtils";
 
-// img
-import user from "/assets/images/user/user1.webp";
 import { useRef } from "react";
 
-const HeaderDefault = memo(() => {
+const HeaderDefault = memo((props) => {
   const dispatch = useDispatch();
   const [isMega, setIsMega] = useState(true);
   const location = useLocation();
   const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
-  const { isAuthenticated, setIsAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   //for translation
   const { t, i18n } = useTranslation();
@@ -62,7 +60,22 @@ const HeaderDefault = memo(() => {
   const [open3, setOpen3] = useState(false);
 
   const [loggedIn, setLoggedIn] = useState(false);
-  const hasCheckedLoginStatus = useRef(false);
+
+  useEffect(() => {
+    setLoggedIn(isAuthenticated);
+    if (isAuthenticated && user) {
+      dispatch(setUser(user));
+    }
+  }, [isAuthenticated, user, dispatch]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -80,26 +93,6 @@ const HeaderDefault = memo(() => {
       setIsMega(location.pathname === "/");
     };
 
-    const checkLoginStatus = async () => {
-      try {
-        const response = await fetch(`${apiUrl}/auth/isAuthenticated`, {
-          method: "GET",
-          credentials: "include",
-        });
-        console.log("Response status:", response.status);
-        const data = await response.json();
-        console.log("Response data:", data);
-        setLoggedIn(data.isAuthenticated);
-      } catch (error) {
-        console.error("Error checking login status:", error);
-      }
-    };
-
-    if (!hasCheckedLoginStatus.current) {
-      checkLoginStatus();
-      hasCheckedLoginStatus.current = true;
-    }
-
     window.addEventListener("scroll", handleScroll);
     updateIsMega();
 
@@ -107,17 +100,6 @@ const HeaderDefault = memo(() => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      setIsAuthenticated(false);
-      dispatch(setUser(null));
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
-  };
 
   return (
     <Fragment>

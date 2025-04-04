@@ -1,30 +1,83 @@
 // src/contexts/AuthContext.js
 import React, { createContext, useState, useContext, useEffect } from "react";
+import { validateToken, getUserData } from "../utilities/authUtils";
 
 const AuthContext = createContext(null);
+const TOKEN_KEY = 'jwtToken';
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+
+  const login = (token, userData) => {
+    localStorage.setItem(TOKEN_KEY, token);
+    setIsAuthenticated(true);
+    setUser(userData);
+    window.dispatchEvent(new Event('authChange'));
+  };
+
+  const logout = () => {
+    localStorage.removeItem(TOKEN_KEY);
+    setIsAuthenticated(false);
+    setUser(null);
+    window.dispatchEvent(new Event('authChange'));
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem("jwtToken");
-    setIsAuthenticated(!!token);
+    // Check token validity on mount
+    const checkToken = async () => {
+      const isValid = await validateToken();
+      setIsAuthenticated(isValid);
+      
+      if (isValid) {
+        const userData = await getUserData();
+        if (userData) {
+          setUser(userData);
+          console.log('Loaded user data from localStorage:', userData);
+        } else {
+          console.warn('Valid token but no user data found');
+        }
+      } else {
+        setUser(null);
+      }
+    };
+    checkToken();
 
-    // Create a custom event listener
-    const handleAuthChange = () => {
-      const newToken = localStorage.getItem("jwtToken");
-      setIsAuthenticated(!!newToken);
+    // Listen for auth changes
+    const handleAuthChange = async () => {
+      const isValid = await validateToken();
+      setIsAuthenticated(isValid);
+      
+      if (isValid) {
+        const userData = await getUserData();
+        if (userData) {
+          setUser(userData);
+          console.log('Auth change: loaded user data from localStorage:', userData);
+        } else {
+          console.warn('Auth change: valid token but no user data found');
+        }
+      } else {
+        setUser(null);
+      }
     };
 
     window.addEventListener("authChange", handleAuthChange);
-
     return () => {
       window.removeEventListener("authChange", handleAuthChange);
     };
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+    <AuthContext.Provider 
+      value={{ 
+        isAuthenticated, 
+        setIsAuthenticated,
+        user,
+        setUser,
+        login,
+        logout
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

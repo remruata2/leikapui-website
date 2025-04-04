@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { Col, Container, Nav, Row, Tab } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import VideoJS from "../../components/plugins/VideoJs";
+import VideoPlayerIframe from "../../components/VideoPlayerIframe";
 import { FaCartPlus } from "react-icons/fa";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -12,7 +13,22 @@ import { useAuth } from "../../context/AuthContext";
 import "./DetailPage.css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Thumbs } from "swiper";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
+
+const loadRazorpay = () => {
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => {
+      resolve(true);
+    };
+    script.onerror = () => {
+      resolve(false);
+    };
+    document.body.appendChild(script);
+  });
+};
 
 const CastCard = memo(({ image_url, name, role }) => (
   <div className="cast-item">
@@ -25,72 +41,136 @@ const CastCard = memo(({ image_url, name, role }) => (
 CastCard.displayName = "CastCard";
 
 const DetailPage = memo(() => {
+  const [personDetails, setPersonDetails] = useState([]);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [showModal, setShowModal] = useState(false);
   const [toggler, setToggler] = useState(false);
   const playerRef = React.useRef(null);
   const { t } = useTranslation();
-  const [selectedMovie, setSelectedMovie] = useState(null);
+  const [selectedMovie, setSelectedMovie] = useState({});
   const { id: movieId } = useParams();
   const user = useSelector((state) => state.user?.user);
   const apiUrl = import.meta.env.VITE_API_URL;
-  const [hasPaid, setHasPaid] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isPaymentStatusLoaded, setIsPaymentStatusLoaded] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
-  const [remainingTime, setRemainingTime] = useState(0);
-  const [personDetails, setPersonDetails] = useState([]);
+  const [hasPaid, setHasPaid] = useState(false);
+  const [remainingTime, setRemainingTime] = useState("some time");
+  const [userData, setUserData] = useState(null);
   const [videoJsOptions, setVideoJsOptions] = useState([]);
   const [videoJsTrailerOptions, setVideoJsTrailerOptions] = useState([]);
   const [trailerUrl, setTrailerUrl] = useState(null);
-  const { isAuthenticated } = useAuth();
+  const [trailerVideoId, setTrailerVideoId] = useState(null);
+  const [videoId, setVideoId] = useState(null);
+  const { isAuthenticated, user: authUser } = useAuth();
   const navigate = useNavigate();
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentId, setPaymentId] = useState(null);
+  const [paymentStatus, setPaymentStatus] = useState("idle");
+  const location = useLocation();
+  const dispatch = useDispatch();
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [renderVideo, setRenderVideo] = useState(false);
+
+  // Ensure user data is synchronized with auth state
+  useEffect(() => {
+    if (isAuthenticated && authUser) {
+      console.log("Auth state changed - user is authenticated:", authUser);
+      if (!user) {
+        console.log("Dispatching user data to Redux store");
+        dispatch(setUser(authUser));
+      }
+    } else if (!isAuthenticated) {
+      console.log("Auth state changed - user is not authenticated");
+    }
+  }, [isAuthenticated, authUser, user, dispatch]);
 
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
 
       // Fetch all data in parallel
-      const [
-        movieResponse,
-        likeStatusResponse,
-        likeCountResponse,
-        paymentStatusResponse,
-      ] = await Promise.all([
-        axios.get(`${apiUrl}/api/movies/${movieId}`),
-        user
-          ? axios.get(`${apiUrl}/api/movies/${movieId}/like`, {
-              params: { userId: user._id },
-            })
-          : Promise.resolve(null),
-        axios.get(`${apiUrl}/api/movies/${movieId}/like-count`),
-        user
-          ? axios.post(`${apiUrl}/api/payments/status`, {
-              userId: user._id,
-              movieId: movieId,
-            })
-          : Promise.resolve(null),
-      ]);
+      const [movieResponse, likeStatusResponse, likeCountResponse] =
+        await Promise.all([
+          axios.get(`${apiUrl}/api/movies/${movieId}`),
+          user
+            ? axios.get(`${apiUrl}/api/movies/${movieId}/like-status`, {
+                params: { userId: user._id },
+              })
+            : Promise.resolve(null),
+          axios.get(`${apiUrl}/api/movies/${movieId}/like-count`),
+        ]);
 
       // Extract and set movie data
       const movieData = movieResponse.data.data;
-      movieData.release_year = new Date(movieData.release_date).getFullYear();
       setSelectedMovie(movieData);
-      if (movieData.trailer_url) {
-        setTrailerUrl(movieData.trailer_url);
-      }
-      console.log("Trailer url", movieData.trailer_url);
 
-      // Set like status and count
+      // Set like status if user is authenticated
       if (likeStatusResponse) {
         setIsLiked(likeStatusResponse.data.isLiked);
       }
-      setLikeCount(likeCountResponse.data.likeCount);
 
-      // Set payment status
-      if (paymentStatusResponse) {
-        const { hasPaid, remainingTime } = paymentStatusResponse.data;
-        setHasPaid(hasPaid);
-        setRemainingTime(remainingTime);
+      // Set like count
+      if (likeCountResponse) {
+        setLikeCount(likeCountResponse.data.likesCount);
+      }
+
+      // Set video IDs from movie_url object if available
+      if (movieData.movie_url) {
+        // Prioritize dashUrl, then hlsUrl, then mp4Url
+        const videoUrl =
+          movieData.movie_url.dashUrl ||
+          movieData.movie_url.hlsUrl ||
+          movieData.movie_url.mp4Url;
+        if (videoUrl) {
+          setVideoId(videoUrl);
+        }
+      }
+
+      // Set trailer URL if available
+      if (movieData.trailer) {
+        // If it's a Bunny.net URL, use as is
+        if (movieData.trailer.includes("mediadelivery.net")) {
+          setTrailerVideoId(movieData.trailer);
+        } else {
+          // Try to extract YouTube ID if it's a YouTube URL
+          const trailerID = movieData.trailer.split("v=")[1]?.split("&")[0];
+          if (trailerID) {
+            setTrailerUrl(trailerID);
+          }
+        }
+      }
+
+      // Check payment status separately if user is authenticated
+      if (user) {
+        try {
+          const token = localStorage.getItem("jwtToken");
+          // Use the purchases/check endpoint
+          const purchaseCheckResponse = await axios.get(
+            `${apiUrl}/api/purchases/check/${movieId}`,
+            {
+              params: { userId: user._id },
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          console.log("Purchase check response:", purchaseCheckResponse.data);
+
+          if (purchaseCheckResponse.data) {
+            const { success, hasAccess } = purchaseCheckResponse.data;
+            setHasPaid(hasAccess); // Use hasAccess instead of hasPaid
+
+            // If there's still remainingTime in the response, use it
+            if (purchaseCheckResponse.data.remainingTime) {
+              setRemainingTime(purchaseCheckResponse.data.remainingTime);
+            } else {
+              // Default value or empty string if not provided
+              setRemainingTime("some time");
+            }
+          }
+        } catch (paymentError) {
+          console.error("Error checking purchase status:", paymentError);
+          // Don't set payment status as an error here, just log it
+        }
       }
 
       // Process person details directly from the populated data
@@ -107,7 +187,6 @@ const DetailPage = memo(() => {
       console.error("Error fetching data:", error);
     } finally {
       setIsLoading(false);
-      setIsPaymentStatusLoaded(true);
     }
   }, [apiUrl, movieId, user]);
 
@@ -145,9 +224,89 @@ const DetailPage = memo(() => {
     });
   }, [trailerUrl]);
 
+  useEffect(() => {
+    if (!paymentId || paymentStatus !== "processing") return;
+
+    const interval = setInterval(async () => {
+      try {
+        // Get auth token from localStorage
+        const token = localStorage.getItem("jwtToken");
+        if (!token) {
+          console.error("No auth token available to check payment status");
+          return;
+        }
+
+        // Use the exact same API call approach as in the Expo app
+        const response = await axios.get(
+          `${apiUrl}/api/payments/transaction-status/${paymentId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        console.log("Transaction status check result:", response.data);
+
+        if (response.data.success) {
+          if (response.data.transaction.status === "completed") {
+            setPaymentStatus("success");
+            clearInterval(interval);
+            // Refresh data to get updated payment status
+            fetchData();
+          } else if (response.data.transaction.status === "failed") {
+            setPaymentStatus("failed");
+            clearInterval(interval);
+            Swal.fire({
+              title: "Payment Failed",
+              text: "The payment could not be processed",
+              icon: "error",
+            });
+          }
+          // Continue polling for 'pending' status
+        }
+      } catch (error) {
+        console.error("Error checking payment status:", error);
+        // Don't clear interval on error, keep trying
+      }
+    }, 5000); // Check every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [paymentId, paymentStatus, apiUrl, fetchData]);
+
+  useEffect(() => {
+    if (showVideoModal) {
+      setRenderVideo(true);
+    } else {
+      // Wait a moment before unmounting to allow for animation
+      const timer = setTimeout(() => {
+        setRenderVideo(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [showVideoModal]);
+
   const castMembers = personDetails.filter((person) => person.type === "cast");
   const crewMembers = personDetails.filter((person) => person.type === "crew");
-  const handlePlayClick = () => setShowModal(true);
+
+  const handlePlayClick = () => {
+    // For full movie, show in modal
+    if (hasPaid && videoId) {
+      setShowVideoModal(true);
+    } else {
+      // For trailer just scroll to it
+      const videoContainer = document.querySelector(".video-container");
+      if (videoContainer) {
+        videoContainer.scrollIntoView({ behavior: "smooth" });
+      }
+
+      // If using VideoJS player, play it directly
+      if (playerRef.current) {
+        playerRef.current.play();
+      }
+    }
+  };
+
   const handlePlayerReady = useCallback(
     (player) => {
       playerRef.current = player;
@@ -166,58 +325,224 @@ const DetailPage = memo(() => {
   );
 
   const handlePayment = useCallback(async () => {
-    if (!isAuthenticated) {
-      navigate("/login", { state: { from: location } });
-      return;
-    }
     try {
-      const response = await axios.post(`${apiUrl}/api/payments/initiate`, {
-        userId: user._id,
-        contentId: movieId,
-        contentType: "Movie",
+      console.log("Payment initiated, auth state:", {
+        isAuthenticated,
+        user,
+        authUser,
       });
-      const { orderId } = response.data;
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: selectedMovie.ppv_cost * 100,
-        currency: "INR",
-        name: "Movie Payment",
-        description: `Payment for movie: ${selectedMovie.title}`,
-        order_id: orderId,
-        handler: async function (response) {
-          console.log("Payment successful:", response);
-          setHasPaid(true);
-          await fetchData();
-        },
-        prefill: {
-          name: user.full_name,
-          email: user.email,
-          contact: user.phone,
-        },
-        notes: {
-          userId: user._id,
-          contentId: movieId,
-          contentType: "Movie",
-        },
-        theme: {
-          color: "#F37254",
-        },
-      };
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
+
+      if (!isAuthenticated) {
+        console.log("Not authenticated, redirecting to login");
+        navigate("/login", { state: { from: location } });
+        return;
+      }
+
+      // Use the auth user or redux user, whichever is available
+      const userData = authUser || user;
+
+      if (!userData || !userData._id) {
+        console.log("No user data available:", { authUser, user });
+
+        // Attempt to load user data directly from localStorage
+        const storedUserData = localStorage.getItem("userData");
+        if (storedUserData) {
+          try {
+            const parsedUserData = JSON.parse(storedUserData);
+            if (parsedUserData && parsedUserData._id) {
+              console.log("Found user data in localStorage:", parsedUserData);
+              processPayment(parsedUserData);
+              return;
+            }
+          } catch (e) {
+            console.error("Error parsing userData from localStorage:", e);
+          }
+        }
+
+        Swal.fire({
+          title: "Authentication Error",
+          text: "User data not available. Please log in again.",
+          icon: "error",
+        });
+        navigate("/login", { state: { from: location } });
+        return;
+      }
+
+      // If we have userData, proceed with payment
+      processPayment(userData);
     } catch (error) {
-      console.error("Error initiating payment:", error);
+      console.error("Payment initialization error:", error);
+      console.error("Error details:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+      setPaymentLoading(false);
+      Swal.fire({
+        title: "Payment Initialization Failed",
+        text:
+          error.response?.data?.message ||
+          error.message ||
+          "Could not start payment process",
+        icon: "error",
+      });
     }
   }, [
     apiUrl,
-    fetchData,
     movieId,
     selectedMovie,
-    user,
     isAuthenticated,
+    user,
+    authUser,
     navigate,
     location,
   ]);
+
+  // Function to handle the actual payment process
+  const processPayment = async (userData) => {
+    try {
+      setPaymentLoading(true);
+
+      const razorpayLoaded = await loadRazorpay();
+      if (!razorpayLoaded) {
+        throw new Error("Razorpay SDK failed to load");
+      }
+
+      console.log("Initiating payment with data:", {
+        userId: userData._id,
+        contentId: movieId,
+        contentType: "Movie",
+        amount: selectedMovie.ppv_cost,
+      });
+
+      // Use the exact endpoint name from backend
+      const orderResponse = await axios.post(
+        `${apiUrl}/api/payments/initiate`,
+        {
+          userId: userData._id,
+          contentId: movieId,
+          contentType: "Movie",
+          amount: selectedMovie.ppv_cost,
+          deviceInfo: {
+            deviceType: "web",
+            browser: navigator.userAgent,
+          },
+        }
+      );
+
+      console.log("Order response:", orderResponse.data);
+
+      if (!orderResponse.data.order_id) {
+        throw new Error("No order ID received from server");
+      }
+
+      // Store these values for payment verification
+      const transactionId = orderResponse.data.transaction_id;
+      const paymentReference = orderResponse.data.paymentReference;
+
+      console.log("Creating Razorpay instance with options:", {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: orderResponse.data.amount,
+        currency: "INR",
+        order_id: orderResponse.data.order_id,
+      });
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: orderResponse.data.amount,
+        currency: "INR",
+        name: "Movie Payment",
+        description: `Payment for movie: ${selectedMovie.title}`,
+        order_id: orderResponse.data.order_id,
+        prefill: {
+          name: userData?.full_name || "",
+          email: userData?.email || "",
+          contact: userData?.phone || "",
+        },
+        handler: async function (response) {
+          try {
+            console.log(
+              "Payment successful, verifying with backend:",
+              response
+            );
+            // Verify the payment with backend
+            const verifyResponse = await axios.post(
+              `${apiUrl}/api/payments/verify`,
+              {
+                userId: userData._id,
+                contentId: movieId,
+                contentType: "Movie",
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+                transactionId: transactionId, // Add missing required field
+                paymentReference: paymentReference, // Add missing required field
+                deviceInfo: {
+                  deviceType: "web",
+                  browser: navigator.userAgent,
+                },
+              }
+            );
+
+            console.log("Verification response:", verifyResponse.data);
+
+            if (verifyResponse.data.success) {
+              setPaymentId(verifyResponse.data.transactionId);
+              setPaymentStatus("processing");
+              Swal.fire({
+                title: "Payment Successful",
+                text: "Your payment has been processed successfully.",
+                icon: "success",
+              });
+              // Refresh payment status
+              fetchData();
+            } else {
+              throw new Error("Payment verification failed");
+            }
+          } catch (error) {
+            console.error("Payment verification error:", error);
+            console.error("Error response:", error.response?.data);
+            setPaymentStatus("failed");
+            Swal.fire({
+              title: "Payment Failed",
+              text:
+                error.response?.data?.message || "Payment verification failed",
+              icon: "error",
+            });
+          } finally {
+            setPaymentLoading(false);
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setPaymentLoading(false);
+          },
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", function (response) {
+        console.error("Payment failed:", response.error);
+        Swal.fire({
+          title: "Payment Failed",
+          text: response.error.description || "Payment could not be completed",
+          icon: "error",
+        });
+        setPaymentLoading(false);
+      });
+
+      console.log("Opening Razorpay modal");
+      rzp.open();
+    } catch (error) {
+      console.error("Payment process error:", error);
+      setPaymentLoading(false);
+      Swal.fire({
+        title: "Payment Error",
+        text: error.message || "An error occurred during payment",
+        icon: "error",
+      });
+    }
+  };
 
   const handleLikeClick = useCallback(async () => {
     if (!isAuthenticated) {
@@ -244,7 +569,19 @@ const DetailPage = memo(() => {
     }
   }, [apiUrl, movieId, user, isAuthenticated, navigate, location]);
 
-  if (isLoading || !selectedMovie || !isPaymentStatusLoaded) {
+  // Webhook simulation (for testing)
+  const simulateWebhook = async (paymentId, status) => {
+    try {
+      await axios.post(`${apiUrl}/api/payments/webhook/simulate`, {
+        paymentId,
+        status,
+      });
+    } catch (error) {
+      console.error("Error simulating webhook:", error);
+    }
+  };
+
+  if (isLoading || !selectedMovie) {
     return <div>Loading...</div>;
   }
 
@@ -257,11 +594,20 @@ const DetailPage = memo(() => {
               <div className="movie-details-container">
                 <div className="movie-details-content">
                   <div className="video-container">
-                    <VideoJS
-                      options={hasPaid ? videoJsOptions : videoJsTrailerOptions}
-                      onReady={handlePlayerReady}
-                    />
-                    {!hasPaid && <div className="trailer-tag">Trailer</div>}
+                    {/* Always show trailer on the page */}
+                    {trailerVideoId ? (
+                      <VideoPlayerIframe
+                        videoId={trailerVideoId}
+                        autoPlay={false}
+                      />
+                    ) : (
+                      <VideoJS
+                        options={videoJsTrailerOptions}
+                        onReady={handlePlayerReady}
+                      />
+                    )}
+                    {/* Show trailer tag */}
+                    <div className="trailer-tag">Trailer</div>
                   </div>
                 </div>
                 <div className="movie-details-description ml-3">
@@ -305,19 +651,59 @@ const DetailPage = memo(() => {
                     </Col>
                   </Row>
                   {hasPaid ? (
-                    <span>
-                      You have{" "}
-                      <span className="text-primary text-strong">
-                        {remainingTime}
-                      </span>{" "}
-                      to watch this movie
-                    </span>
+                    <div className="d-flex flex-column">
+                      <button
+                        className="btn btn-primary btn-watch"
+                        onClick={handlePlayClick}
+                        style={{
+                          width: "fit-content",
+                          padding: "10px 24px",
+                          fontSize: "16px",
+                          fontWeight: "bold",
+                          marginBottom: "20px",
+                        }}
+                      >
+                        <i className="fa fa-play me-2"></i> Watch Now
+                      </button>
+                      {/* Only show remaining time if it's available */}
+                      {remainingTime && (
+                        <span className="mb-3">
+                          You have{" "}
+                          <span className="text-primary fw-bold">
+                            {remainingTime}
+                          </span>{" "}
+                          to watch this movie
+                        </span>
+                      )}
+                    </div>
                   ) : (
-                    <div className="coming-soon-notice">
-                      <span className="text-primary">Coming Soon!</span>
-                      <p className="mt-2">
-                        Movie rentals will be available shortly.
+                    <div className="d-flex flex-column">
+                      <p className="mb-3">
+                        Rent this movie to watch the full content
                       </p>
+                      <button
+                        className="btn btn-primary"
+                        onClick={handlePayment}
+                        disabled={paymentLoading}
+                        style={{
+                          width: "fit-content",
+                          padding: "10px 24px",
+                          fontSize: "16px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {paymentLoading ? (
+                          <>
+                            <i className="fa fa-spinner fa-spin me-2"></i>{" "}
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            <i className="fa fa-credit-card me-2"></i> Rent for
+                            ₹{selectedMovie?.ppv_cost}
+                          </>
+                        )}
+                      </button>
                     </div>
                   )}
                   <Row>
@@ -494,6 +880,58 @@ const DetailPage = memo(() => {
           </Row>
         </Container>
       </div>
+      {/* Modal for full movie playback */}
+      {hasPaid && (
+        <div
+          className={`video-modal ${showVideoModal ? "show" : ""}`}
+          style={{
+            display: showVideoModal ? "flex" : "none",
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.9)",
+            zIndex: 9999,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "20px",
+          }}
+        >
+          <div
+            className="modal-close"
+            onClick={() => {
+              setShowVideoModal(false);
+            }}
+            style={{
+              position: "absolute",
+              top: "20px",
+              right: "20px",
+              color: "white",
+              fontSize: "24px",
+              cursor: "pointer",
+              zIndex: 10000,
+            }}
+          >
+            <i className="fa fa-times"></i>
+          </div>
+          <div
+            className="modal-content"
+            style={{
+              width: "90%",
+              maxWidth: "1200px",
+            }}
+          >
+            {renderVideo && videoId && (
+              <VideoPlayerIframe
+                videoId={videoId}
+                autoPlay={true}
+                onClose={() => setShowVideoModal(false)}
+              />
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 });
