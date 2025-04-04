@@ -33,7 +33,8 @@ const LoginPage = memo(() => {
 
     try {
       const authResult = await authenticateWithBackend(
-        credentialResponse.credential
+        credentialResponse.credential,
+        "google"
       );
       if (authResult.success && authResult.isAuthenticated) {
         handleSuccessfulLogin();
@@ -50,18 +51,37 @@ const LoginPage = memo(() => {
   };
 
   const handleGoogleError = () => {
-    console.log("Login Failed");
+    console.log("Google Login Failed");
+    loginAttemptInProgress.current = false;
+    setIsLoading(false);
   };
 
   const handleFacebookLogin = async (response) => {
+    // Prevent concurrent login attempts
+    if (loginAttemptInProgress.current) {
+      console.log("Login attempt already in progress");
+      return;
+    }
+
+    loginAttemptInProgress.current = true;
+    setIsLoading(true);
+
     try {
-      const data = await sendFacebookToken(response.accessToken);
-      localStorage.setItem("jwtToken", data.token);
-      window.dispatchEvent(new Event("authChange"));
-      navigate("/");
+      const authResult = await authenticateWithBackend(
+        response.accessToken,
+        "facebook"
+      );
+      if (authResult.success && authResult.isAuthenticated) {
+        handleSuccessfulLogin();
+      } else {
+        throw new Error(authResult.message || "Authentication failed");
+      }
     } catch (error) {
-      console.error("Error:", error);
-      // Handle navigation error or show user feedback
+      console.error("Facebook login error:", error);
+      alert(error.message || "Failed to authenticate. Please try again.");
+    } finally {
+      setIsLoading(false);
+      loginAttemptInProgress.current = false;
     }
   };
 

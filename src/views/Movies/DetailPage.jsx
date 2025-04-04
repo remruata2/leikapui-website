@@ -313,10 +313,12 @@ const DetailPage = memo(() => {
                       to watch this movie
                     </span>
                   ) : (
-                    <button className="pay-button" onClick={handlePayment}>
-                      <FaCartPlus size="1.5em" /> Rent for Rs.{" "}
-                      {selectedMovie.ppv_cost} (3 days)
-                    </button>
+                    <div className="coming-soon-notice">
+                      <span className="text-primary">Coming Soon!</span>
+                      <p className="mt-2">
+                        Movie rentals will be available shortly.
+                      </p>
+                    </div>
                   )}
                   <Row>
                     <div className="details-part content-details trending-info">

@@ -128,20 +128,20 @@ const HeaderDefault = memo(() => {
         >
           <Container fluid className="navbar-inner">
             <div className="d-flex align-items-center justify-content-between w-100 landing-header">
-              <div className="d-flex gap-3 gap-xl-0 align-items-center">
-                <div>
+              <div className="d-flex align-items-center justify-content-center flex-grow-1 flex-xl-grow-0">
+                <div className="d-xl-none">
                   <button
                     type="button"
                     data-bs-toggle="offcanvas"
                     data-bs-target="#navbar_main"
                     aria-controls="navbar_main"
-                    className="d-xl-none btn btn-primary rounded-pill p-1 pt-0 toggle-rounded-btn"
+                    className="btn btn-primary rounded-pill p-1 pt-0 toggle-rounded-btn me-3"
                     onClick={() => setShow1(!show1)}
                   >
                     <svg width="20px" className="icon-20" viewBox="0 0 24 24">
                       <path
                         fill="currentColor"
-                        d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"
+                        d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"
                       ></path>
                     </svg>
                   </button>
@@ -160,275 +160,139 @@ const HeaderDefault = memo(() => {
               >
                 <Container fluid className="container-fluid p-lg-0">
                   <Offcanvas.Header
-                    className="px-0"
+                    className="px-0 pt-0"
                     closeButton
                     onHide={() => setShow1(false)}
                   >
-                    <div className="navbar-brand ms-3">
+                    <div className="navbar-brand d-flex justify-content-center w-100">
                       <Logo></Logo>
                     </div>
                   </Offcanvas.Header>
-                  <ul
-                    className="navbar-nav iq-nav-menu list-unstyled"
-                    id="header-menu"
-                  >
-                    <Nav.Item as="li">
-                      <Nav.Link
-                        aria-expanded={open2}
-                        as={Link}
-                        to="/"
-                        className={`${
-                          location.pathname === "/" ? "active" : ""
-                        }`}
-                      >
-                        <span className="item-name">{t("header.home")}</span>
-                      </Nav.Link>
-                    </Nav.Item>
+                  {(isAuthenticated || location.pathname !== "/") && (
+                    <ul
+                      className="navbar-nav iq-nav-menu list-unstyled"
+                      id="header-menu"
+                    >
+                      <Nav.Item as="li">
+                        <Nav.Link
+                          as={Link}
+                          to="/"
+                          className={`${
+                            location.pathname === "/" ? "active" : ""
+                          }`}
+                          onClick={() => setShow1(false)}
+                        >
+                          <span className="item-name">{t("header.home")}</span>
+                        </Nav.Link>
+                      </Nav.Item>
 
-                    <Nav.Item as="li">
-                      <Nav.Link
-                        as={Link}
-                        to="/movies"
-                        className={`${
-                          location.pathname === "/movies" ? "active" : ""
-                        }`}
-                      >
-                        <span className="item-name">{t("header.movie")}</span>
-                      </Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item as="li">
-                      <Nav.Link
-                        aria-expanded={open2}
-                        as={Link}
-                        to="/tv-shows"
-                        className={`${
-                          location.pathname === "/tv-shows" ? "active" : ""
-                        }`}
-                      >
-                        <span className="item-name">{t("Series")}</span>
-                      </Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item as="li">
-                      <Nav.Link
-                        aria-expanded={open2}
-                        href="#homePages"
-                        onClick={() => setOpen2(!open2)}
-                        className={`${
-                          location.pathname === "/about-us" ||
-                          location.pathname === "/contact-us" ||
-                          location.pathname === "/faq" ||
-                          location.pathname === "/privacy-policy" ||
-                          location.pathname === "/terms-of-use" ||
-                          location.pathname === "/cancellation-refund" ||
-                          location.pathname === "/pricing" ||
-                          location.pathname === "/coming-soon"
-                            ? "active"
-                            : ""
-                        }`}
-                      >
-                        <span className="item-name">{t("header.pages")}</span>
-                        <span className="menu-icon ms-2">
-                          <i
-                            className="fa fa-caret-down toggledrop-desktop right-icon"
-                            aria-hidden="true"
-                          ></i>
-                          <span className="toggle-menu">
+                      <Nav.Item as="li">
+                        <Nav.Link
+                          as={Link}
+                          to="/movies"
+                          className={`${
+                            location.pathname === "/movies" ? "active" : ""
+                          }`}
+                          onClick={() => setShow1(false)}
+                        >
+                          <span className="item-name">{t("header.movie")}</span>
+                        </Nav.Link>
+                      </Nav.Item>
+                      <Nav.Item as="li">
+                        <Nav.Link
+                          as={Link}
+                          to="/tv-shows"
+                          className={`${
+                            location.pathname === "/tv-shows" ? "active" : ""
+                          }`}
+                          onClick={() => setShow1(false)}
+                        >
+                          <span className="item-name">{t("Series")}</span>
+                        </Nav.Link>
+                      </Nav.Item>
+                      <Nav.Item as="li">
+                        <Nav.Link
+                          aria-expanded={open2}
+                          href="#"
+                          onClick={() => setOpen2(!open2)}
+                          className={`${
+                            location.pathname === "/contact-us" ||
+                            location.pathname === "/privacy-policy" ||
+                            location.pathname === "/terms-of-use" ||
+                            location.pathname === "/cancellation-refund"
+                              ? "active"
+                              : ""
+                          }`}
+                        >
+                          <span className="item-name">{t("header.pages")}</span>
+                          <span className="menu-icon ms-2">
                             <i
-                              className="fa fa-plus  arrow-active text-white"
-                              aria-hidden="true"
-                            ></i>
-                            <i
-                              className="fa fa-minus  arrow-hover text-white"
+                              className={`fa ${
+                                open2 ? "fa-caret-up" : "fa-caret-down"
+                              } toggledrop-desktop right-icon`}
                               aria-hidden="true"
                             ></i>
                           </span>
-                        </span>
-                      </Nav.Link>
-                      <Collapse in={open2} className="sub-nav list-unstyled">
-                        <ul>
-                          <Nav.Item as="li">
-                            <Link
-                              to="/about-us"
-                              className={`${
-                                location.pathname === "/about-us"
-                                  ? "active"
-                                  : ""
-                              } nav-link`}
-                            >
-                              {" "}
-                              {t("header.about_us")}{" "}
-                            </Link>
-                          </Nav.Item>
-                          <Nav.Item as="li">
-                            <Link
-                              to="/contact-us"
-                              className={`${
-                                location.pathname === "/contact-us"
-                                  ? "active"
-                                  : ""
-                              } nav-link`}
-                            >
-                              {" "}
-                              {t("header.contact_us")}{" "}
-                            </Link>
-                          </Nav.Item>
-                          <Nav.Item as="li">
-                            <Link
-                              to="/privacy-policy"
-                              className={`${
-                                location.pathname === "/privacy-policy"
-                                  ? "active"
-                                  : ""
-                              } nav-link`}
-                            >
-                              {" "}
-                              Privacy Policy{" "}
-                            </Link>
-                          </Nav.Item>
-                          <Nav.Item as="li">
-                            <Link
-                              to="/terms-of-use"
-                              className={`${
-                                location.pathname === "/terms-of-use"
-                                  ? "active"
-                                  : ""
-                              } nav-link`}
-                            >
-                              {" "}
-                              Terms of Use{" "}
-                            </Link>
-                          </Nav.Item>
-                          <Nav.Item as="li">
-                            <Link
-                              to="/cancellation-refund"
-                              className={`${
-                                location.pathname === "/cancellation-refund"
-                                  ? "active"
-                                  : ""
-                              } nav-link`}
-                            >
-                              {" "}
-                              Cancellation & Refund{" "}
-                            </Link>
-                          </Nav.Item>
-                          <Nav.Item as="li">
-                            <Link
-                              to="/faq"
-                              className={`${
-                                location.pathname === "/faq" ? "active" : ""
-                              } nav-link`}
-                            >
-                              {" "}
-                              {t("header.faq")}{" "}
-                            </Link>
-                          </Nav.Item>
-                          <Nav.Item as="li">
-                            <Link
-                              to="/PrivacyPolicy"
-                              className={`${
-                                location.pathname === "/PrivacyPolicy"
-                                  ? "active"
-                                  : ""
-                              } nav-link`}
-                            >
-                              {" "}
-                              {t("header.privacy_policy")}{" "}
-                            </Link>
-                          </Nav.Item>
-                          <Nav.Item as="li">
-                            <Link
-                              to="/pricing"
-                              className={`${
-                                location.pathname === "/pricing" ? "active" : ""
-                              } nav-link`}
-                            >
-                              {" "}
-                              {t("header.pricing_plan")}{" "}
-                            </Link>
-                          </Nav.Item>
-                          <Nav.Item as="li">
-                            <Link
-                              to="/coming-soon"
-                              className={`${
-                                location.pathname === "/coming-soon"
-                                  ? "active"
-                                  : ""
-                              } nav-link`}
-                            >
-                              {" "}
-                              {t("header.coming_soon")}{" "}
-                            </Link>
-                          </Nav.Item>
-                          <Nav.Item as="li">
-                            <Nav.Link
-                              aria-expanded={open3}
-                              href="#homePages"
-                              onClick={() => setOpen3(!open3)}
-                              className={`${
-                                location.pathname === "/error-page-one" ||
-                                location.pathname === "/error-page-two"
-                                  ? "active"
-                                  : ""
-                              }`}
-                            >
-                              <span className="item-name">
-                                {t("header.error_page")}
-                              </span>
-                              <span className="menu-icon">
-                                <i
-                                  className="fa fa-caret-right toggledrop-desktop right-icon"
-                                  aria-hidden="true"
-                                ></i>
-                                <span className="toggle-menu">
-                                  <i
-                                    className="fa fa-plus  arrow-active text-white"
-                                    aria-hidden="true"
-                                  ></i>
-                                  <i
-                                    className="fa fa-minus  arrow-hover text-white"
-                                    aria-hidden="true"
-                                  ></i>
-                                </span>
-                              </span>
-                            </Nav.Link>
-                            <Collapse
-                              in={open3}
-                              className="sub-nav list-unstyled"
-                            >
-                              <ul>
-                                <Nav.Item as="li">
-                                  <Link
-                                    to="/error-page-one"
-                                    className={`${
-                                      location.pathname === "/error-page-one"
-                                        ? "active"
-                                        : ""
-                                    } nav-link`}
-                                  >
-                                    {" "}
-                                    {t("header.error_page")} 1{" "}
-                                  </Link>
-                                </Nav.Item>
-                                <Nav.Item as="li">
-                                  <Link
-                                    to="/error-page-two"
-                                    className={`${
-                                      location.pathname === "/error-page-two"
-                                        ? "active"
-                                        : ""
-                                    } nav-link`}
-                                  >
-                                    {" "}
-                                    {t("header.error_page")} 2{" "}
-                                  </Link>
-                                </Nav.Item>
-                              </ul>
-                            </Collapse>
-                          </Nav.Item>
-                        </ul>
-                      </Collapse>
-                    </Nav.Item>
-                  </ul>
+                        </Nav.Link>
+                        <Collapse in={open2} className="sub-nav list-unstyled">
+                          <ul>
+                            <Nav.Item as="li">
+                              <Link
+                                to="/contact-us"
+                                className={`${
+                                  location.pathname === "/contact-us"
+                                    ? "active"
+                                    : ""
+                                } nav-link`}
+                                onClick={() => setShow1(false)}
+                              >
+                                Contact Us
+                              </Link>
+                            </Nav.Item>
+                            <Nav.Item as="li">
+                              <Link
+                                to="/privacy-policy"
+                                className={`${
+                                  location.pathname === "/privacy-policy"
+                                    ? "active"
+                                    : ""
+                                } nav-link`}
+                                onClick={() => setShow1(false)}
+                              >
+                                Privacy Policy
+                              </Link>
+                            </Nav.Item>
+                            <Nav.Item as="li">
+                              <Link
+                                to="/terms-of-use"
+                                className={`${
+                                  location.pathname === "/terms-of-use"
+                                    ? "active"
+                                    : ""
+                                } nav-link`}
+                                onClick={() => setShow1(false)}
+                              >
+                                Terms of Use
+                              </Link>
+                            </Nav.Item>
+                            <Nav.Item as="li">
+                              <Link
+                                to="/cancellation-refund"
+                                className={`${
+                                  location.pathname === "/cancellation-refund"
+                                    ? "active"
+                                    : ""
+                                } nav-link`}
+                                onClick={() => setShow1(false)}
+                              >
+                                Cancellation & Refund
+                              </Link>
+                            </Nav.Item>
+                          </ul>
+                        </Collapse>
+                      </Nav.Item>
+                    </ul>
+                  )}
                 </Container>
               </Navbar>
 
@@ -701,7 +565,7 @@ const HeaderDefault = memo(() => {
                           </li>
                           <li>
                             <Link
-                              to="/playlist"
+                              to="/profile"
                               className="iq-sub-card d-flex align-items-center gap-3"
                             >
                               <svg
@@ -731,62 +595,75 @@ const HeaderDefault = memo(() => {
                                 />
                               </svg>
                               <h6 className="mb-0 font-size-14 fw-normal">
-                                {t("header.my_account")}
+                                {t("header.profile")}
                               </h6>
                             </Link>
                           </li>
                           <li>
                             <Link
-                              to="/playlist"
+                              to="/devices"
                               className="iq-sub-card d-flex align-items-center gap-3"
                             >
                               <svg
                                 width="16"
                                 height="16"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="m0 0h24v24h-24z"
-                                  fill="#fff"
-                                  opacity="0"
-                                  transform="matrix(-1 0 0 -1 24 24)"
-                                />
-                                <path
-                                  d="m19 11h-6v-6a1 1 0 0 0 -2 0v6h-6a1 1 0 0 0 0 2h6v6a1 1 0 0 0 2 0v-6h6a1 1 0 0 0 0-2z"
-                                  fill="currentColor"
-                                />
-                              </svg>
-                              <h6 className="mb-0 font-size-14 fw-normal">
-                                {t("header.watchlist")}
-                              </h6>
-                            </Link>
-                          </li>
-                          <li>
-                            <Link
-                              to="/pricing"
-                              className="iq-sub-card d-flex align-items-center gap-3"
-                            >
-                              <svg
-                                width="16"
-                                height="16"
-                                strokeWidth="1.5"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
                               >
                                 <path
-                                  d="M8.58737 8.23597L11.1849 3.00376C11.5183 2.33208 12.4817 2.33208 12.8151 3.00376L15.4126 8.23597L21.2215 9.08017C21.9668 9.18848 22.2638 10.0994 21.7243 10.6219L17.5217 14.6918L18.5135 20.4414C18.6409 21.1798 17.8614 21.7428 17.1945 21.3941L12 18.678L6.80547 21.3941C6.1386 21.7428 5.35909 21.1798 5.48645 20.4414L6.47825 14.6918L2.27575 10.6219C1.73617 10.0994 2.03322 9.18848 2.77852 9.08017L8.58737 8.23597Z"
+                                  d="M20 4H4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4Z"
                                   stroke="currentColor"
+                                  strokeWidth="1.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                                <path
+                                  d="M8 4V20"
+                                  stroke="currentColor"
+                                  strokeWidth="1.5"
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                 />
                               </svg>
                               <h6 className="mb-0 font-size-14 fw-normal">
-                                {t("header.subscription")}
+                                {t("header.devices")}
                               </h6>
                             </Link>
                           </li>
+                          <li>
+                            <Link
+                              to="/purchases"
+                              className="iq-sub-card d-flex align-items-center gap-3"
+                            >
+                              <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M16 6V5.2C16 3.43269 14.5673 2 12.8 2H11.2C9.43269 2 8 3.43269 8 5.2V6H3C2.44772 6 2 6.44772 2 7V20C2 21.1046 2.89543 22 4 22H20C21.1046 22 22 21.1046 22 20V7C22 6.44772 21.5523 6 21 6H16Z"
+                                  stroke="currentColor"
+                                  strokeWidth="1.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                                <path
+                                  d="M8 6V5.2C8 3.43269 9.43269 2 11.2 2H12.8C14.5673 2 16 3.43269 16 5.2V6"
+                                  stroke="currentColor"
+                                  strokeWidth="1.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                              <h6 className="mb-0 font-size-14 fw-normal">
+                                {t("header.purchases")}
+                              </h6>
+                            </Link>
+                          </li>
+
                           <li>
                             <Link
                               className="iq-sub-card iq-logout-2 mt-1 d-flex justify-content-center gap-2"

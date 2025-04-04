@@ -118,3 +118,24 @@
     padding: 0 32px;
   }
 }
+
+.coming-soon-notice {
+  background: rgba(184, 16, 16, 0.1);
+  border: 1px solid rgba(184, 16, 16, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.coming-soon-notice .text-primary {
+  color: #b81010;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.coming-soon-notice p {
+  color: #fff;
+  margin: 0;
+  opacity: 0.8;
+}

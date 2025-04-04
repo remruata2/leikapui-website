@@ -4,6 +4,11 @@ import FrontendLayout from "../layouts/FrontendLayout";
 import BlankLayout from "../layouts/BlankLayout";
 import ProtectedRoute from "../components/ProtectedRoute";
 
+// account pages
+const Profile = lazy(() => import("../views/Account/Profile"));
+const Devices = lazy(() => import("../views/Account/Devices"));
+const Purchases = lazy(() => import("../views/Account/Purchases"));
+
 // pages
 const OTTPage = lazy(() => import("../views/MainPages/OTTPage"));
 
@@ -328,6 +333,30 @@ export const LandingpageRouter = [
         element: (
           <ProtectedRoute>
             <ProductDetail />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/profile",
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/devices",
+        element: (
+          <ProtectedRoute>
+            <Devices />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/purchases",
+        element: (
+          <ProtectedRoute>
+            <Purchases />
           </ProtectedRoute>
         ),
       },

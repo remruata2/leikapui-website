@@ -178,3 +178,73 @@
     padding-left: 0;
   }
 }
+
+/* Mobile Header Styles */
+@media (max-width: 1199px) {
+  .mobile-offcanvas {
+    width: 300px !important;
+  }
+
+  .mobile-offcanvas .navbar-brand {
+    margin: 0;
+    padding: 1rem 0;
+  }
+
+  .mobile-offcanvas .offcanvas-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .mobile-offcanvas .offcanvas-header .btn-close {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    color: #fff;
+  }
+
+  .mobile-offcanvas .navbar-nav {
+    padding: 1rem 0;
+  }
+
+  .mobile-offcanvas .nav-link {
+    padding: 0.75rem 1rem;
+  }
+
+  .mobile-offcanvas .sub-nav {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.5rem 0;
+  }
+
+  .mobile-offcanvas .sub-nav .nav-link {
+    padding-left: 2rem;
+  }
+
+  .landing-header {
+    min-height: 60px;
+  }
+
+  .toggle-rounded-btn {
+    margin-right: 1rem;
+  }
+
+  .navbar-brand img {
+    max-height: 120px;
+    width: auto;
+  }
+}
+
+/* Fix logo centering in mobile view */
+@media (max-width: 1199px) {
+  .navbar-inner .landing-header {
+    position: relative;
+  }
+
+  .navbar-inner .landing-header > div:first-child {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .right-panel {
+    margin-left: auto;
+  }
+}
