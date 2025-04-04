@@ -2,8 +2,6 @@ import React, { memo, useRef, useState } from "react";
 import { Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
-import FacebookLogin from "@greatsumini/react-facebook-login";
-import { FaGoogle, FaFacebookF } from "react-icons/fa";
 import Logo from "../../components/logo";
 import { authenticateWithBackend } from "../../utilities/authUtils";
 import "./LoginPage.css";
@@ -103,7 +101,7 @@ const LoginPage = memo(() => {
             <div className="mobile-logo-container">
               <Logo className="mobile-logo" />
             </div>
-            <h1 className="login-title">Welcome Back!</h1>
+            <h1 className="login-title">Login</h1>
             <p className="login-subtitle">Sign in to continue your journey</p>
 
             <div className="auth-buttons">

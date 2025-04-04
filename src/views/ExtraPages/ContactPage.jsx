@@ -10,7 +10,6 @@ import { Link } from "react-router-dom";
 import { generateImgPath } from "../../StaticData/data";
 
 //components
-import BreadcrumbWidget from "../../components/BreadcrumbWidget";
 
 // the hook
 import { useTranslation } from "react-i18next";
@@ -19,7 +18,6 @@ const ContactPage = memo(() => {
   const { t } = useTranslation();
   return (
     <Fragment>
-      <BreadcrumbWidget title={t("header.contact_us")} />
       <div className="section-padding">
         <Container>
           <Row>
@@ -34,7 +32,7 @@ const ContactPage = memo(() => {
                     <input
                       type="text"
                       className="form-control font-size-14"
-                      placeholder={`${t('form.your_name')}*`}
+                      placeholder={`${t("form.your_name")}*`}
                       required=""
                     />
                   </Col>
@@ -42,7 +40,7 @@ const ContactPage = memo(() => {
                     <input
                       type="text"
                       className="form-control font-size-14"
-                      placeholder={`${t('form.last_name')}*`}
+                      placeholder={`${t("form.last_name")}*`}
                       required=""
                     />
                   </Col>
@@ -50,7 +48,7 @@ const ContactPage = memo(() => {
                     <input
                       type="tel"
                       className="form-control font-size-14"
-                      placeholder={`${t('form.phone')}*`}
+                      placeholder={`${t("form.phone")}*`}
                       required=""
                     />
                   </Col>
@@ -58,7 +56,7 @@ const ContactPage = memo(() => {
                     <input
                       type="email"
                       className="form-control font-size-14"
-                      placeholder={`${t('form.your_email')}*`}
+                      placeholder={`${t("form.your_email")}*`}
                       required=""
                     />
                   </Col>
@@ -67,7 +65,7 @@ const ContactPage = memo(() => {
                       className="form-control font-size-14"
                       cols="40"
                       rows="10"
-                      placeholder={`${t('form.message')}`}
+                      placeholder={`${t("form.message")}`}
                     ></textarea>
                   </Col>
                   <Col>
@@ -147,9 +145,7 @@ const ContactPage = memo(() => {
           <Row className="row">
             <Col lg="10">
               <div className="title-box">
-                <h3 className="fw-500">
-                  {t("contact_us.take_challenge")}
-                </h3>
+                <h3 className="fw-500">{t("contact_us.take_challenge")}</h3>
               </div>
             </Col>
             <Col lg="2" className="d-none d-lg-block"></Col>

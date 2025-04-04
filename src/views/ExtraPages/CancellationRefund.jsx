@@ -1,12 +1,10 @@
 import React, { Fragment, memo } from "react";
 import { Container } from "react-bootstrap";
-import BreadCrumbWidget from "../../components/BreadcrumbWidget";
 import "./CancellationRefund.css";
 
 const CancellationRefund = memo(() => {
   return (
     <Fragment>
-      <BreadCrumbWidget title="Cancellation & Refund Policy" />
       <div className="section-padding cancellation-refund">
         <Container>
           <div className="policy-header">

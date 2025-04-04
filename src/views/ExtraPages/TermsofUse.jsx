@@ -1,12 +1,10 @@
 import React, { Fragment, memo } from "react";
 import { Container } from "react-bootstrap";
-import BreadCrumbWidget from "../../components/BreadcrumbWidget";
 import "./TermsofUse.css";
 
 const TermsofUse = memo(() => {
   return (
     <Fragment>
-      <BreadCrumbWidget title="Terms and Conditions" />
       <div className="section-padding terms-of-use">
         <Container>
           <div className="terms-header">

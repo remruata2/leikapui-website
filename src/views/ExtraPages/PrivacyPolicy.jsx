@@ -6,7 +6,6 @@ import "./PrivacyPolicy.css";
 const PrivacyPolicy = memo(() => {
   return (
     <Fragment>
-      <BreadcrumbWidget title="Privacy Policy" />
       <div className="section-padding privacy-policy">
         <Container>
           <div className="policy-header">

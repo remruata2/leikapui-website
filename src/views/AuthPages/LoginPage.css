@@ -5,6 +5,10 @@
   flex-direction: column;
 }
 
+.login-form-container {
+  text-align: center;
+}
+
 .mobile-logo-container {
   display: none;
   text-align: center;
@@ -19,7 +23,7 @@
 .login-container {
   flex: 1;
   display: flex;
-  max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 }
