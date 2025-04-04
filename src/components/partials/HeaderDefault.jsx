@@ -59,10 +59,8 @@ const HeaderDefault = memo((props) => {
   const [open2, setOpen2] = useState(false);
   const [open3, setOpen3] = useState(false);
 
-  const [loggedIn, setLoggedIn] = useState(false);
-
   useEffect(() => {
-    setLoggedIn(isAuthenticated);
+    // This effect runs when authentication state changes
     if (isAuthenticated && user) {
       dispatch(setUser(user));
     }
@@ -71,6 +69,8 @@ const HeaderDefault = memo((props) => {
   const handleLogout = async () => {
     try {
       await logout();
+      // Force a re-render by dispatching an auth change event
+      window.dispatchEvent(new Event('authChange'));
       navigate("/login");
     } catch (error) {
       console.error("Logout error:", error);

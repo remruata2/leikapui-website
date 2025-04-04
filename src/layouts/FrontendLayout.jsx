@@ -10,10 +10,8 @@ import HeaderMerchandise from "../components/merchandise/partials/HeaderDefault"
 
 // footer
 import FooterDefault from "../components/partials/FooterDefault";
-import MerchandiseFooter from "../components/merchandise/partials/FooterDefault";
 import Loader from "../components/Loader";
 //seetingoffCanvas
-import SettingOffCanvas from "../components/setting/SettingOffCanvas";
 
 const FrontendLayout = memo((props) => {
   const [animationClass, setAnimationClass] = useState("animate__fadeIn");

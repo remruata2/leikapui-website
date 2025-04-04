@@ -1,5 +1,4 @@
 import React, { memo, useRef, useState } from "react";
-import { Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import Logo from "../../components/logo";
@@ -9,13 +8,14 @@ import "./LoginPage.css";
 const LoginPage = memo(() => {
   const navigate = useNavigate();
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-  const facebookAppId = import.meta.env.VITE_FACEBOOK_APP_ID;
   const [isLoading, setIsLoading] = useState(false);
   const loginAttemptInProgress = useRef(false);
 
   const handleSuccessfulLogin = () => {
     loginAttemptInProgress.current = false;
     setIsLoading(false);
+    // Dispatch auth change event to immediately update UI across the app
+    window.dispatchEvent(new Event("authChange"));
     navigate("/");
   };
 
@@ -52,35 +52,6 @@ const LoginPage = memo(() => {
     console.log("Google Login Failed");
     loginAttemptInProgress.current = false;
     setIsLoading(false);
-  };
-
-  const handleFacebookLogin = async (response) => {
-    // Prevent concurrent login attempts
-    if (loginAttemptInProgress.current) {
-      console.log("Login attempt already in progress");
-      return;
-    }
-
-    loginAttemptInProgress.current = true;
-    setIsLoading(true);
-
-    try {
-      const authResult = await authenticateWithBackend(
-        response.accessToken,
-        "facebook"
-      );
-      if (authResult.success && authResult.isAuthenticated) {
-        handleSuccessfulLogin();
-      } else {
-        throw new Error(authResult.message || "Authentication failed");
-      }
-    } catch (error) {
-      console.error("Facebook login error:", error);
-      alert(error.message || "Failed to authenticate. Please try again.");
-    } finally {
-      setIsLoading(false);
-      loginAttemptInProgress.current = false;
-    }
   };
 
   return (

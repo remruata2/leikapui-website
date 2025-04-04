@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { FaUser, FaEnvelope, FaPhone, FaEdit } from "react-icons/fa";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { setUser } from "../../store/user/actions";
+import { updateUserProfile } from "../../utilities/authUtils";
 import "./Profile.css";
 
 const Profile = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.user?.user);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -16,6 +19,17 @@ const Profile = () => {
     email: user?.email || "",
     phone: user?.phone || "",
   });
+
+  // Ensure form data is updated if Redux state changes
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        full_name: user.full_name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+      });
+    }
+  }, [user]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -36,20 +50,19 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/users/${user._id}`,
-        formData
-      );
-      if (response.data.success) {
-        Swal.fire({
-          icon: "success",
-          title: t("profile.update_success"),
-          showConfirmButton: false,
-          timer: 1500,
-        });
-        setIsEditing(false);
-        // Update user state here
-      }
+      // Use the centralized utility function instead of direct axios call
+      const updatedUserData = await updateUserProfile(formData);
+
+      // Update Redux store
+      dispatch(setUser(updatedUserData));
+
+      Swal.fire({
+        icon: "success",
+        title: t("profile.update_success"),
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setIsEditing(false);
     } catch (error) {
       Swal.fire({
         icon: "error",

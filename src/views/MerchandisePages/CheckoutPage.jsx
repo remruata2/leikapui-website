@@ -23,13 +23,19 @@ const CheckoutPage = memo(() => {
 
   const options1 = [
     { value: `${t("shop.india")}`, label: `${t("shop.india")}` },
-    { value: `${t("shop.united_kindom")}`, label: `${t("shop.united_kindom")}` },
-    { value: `${t("shop.united_states")}`, label: `${t("shop.united_states")}` },
+    {
+      value: `${t("shop.united_kindom")}`,
+      label: `${t("shop.united_kindom")}`,
+    },
+    {
+      value: `${t("shop.united_states")}`,
+      label: `${t("shop.united_states")}`,
+    },
     { value: `${t("shop.australia")}`, label: `${t("shop.australia")}` },
     { value: `${t("shop.north_corea")}`, label: `${t("shop.north_corea")}` },
   ];
 
-  const [show, setShow] = useState(false)
+  const [show, setShow] = useState(false);
   return (
     <Fragment>
       <BreadCrumbWidget title={t("shop.checkout")} />
@@ -103,7 +109,6 @@ const CheckoutPage = memo(() => {
               </li>
               <li className="cart-page-item ">
                 <span className=" cart-pre-number  border-radius rounded-circle me-1">
-
                   3
                 </span>{" "}
                 <span className="cart-page-link ">
@@ -182,7 +187,11 @@ const CheckoutPage = memo(() => {
                   />
                 </div>
                 <div className="mb-4 iq-custom-select">
-                  <ChoicesJs options={options1} className="js-choice" select="one" />
+                  <ChoicesJs
+                    options={options1}
+                    className="js-choice"
+                    select="one"
+                  />
                 </div>
                 <div className="mb-4">
                   <input
@@ -252,9 +261,7 @@ const CheckoutPage = memo(() => {
                 </div>
                 <h5 className="mb-4">{t("shop.additional_information")}</h5>
                 <div className="mb-4">
-                  <label className="mb-2">
-                    {t("shop.order_notes")}
-                  </label>
+                  <label className="mb-2">{t("shop.order_notes")}</label>
                   <textarea
                     name="your-message"
                     placeholder={t("shop.order_notes_eg")}
@@ -283,7 +290,9 @@ const CheckoutPage = memo(() => {
                             />
                           </div>
                           <div className="text">
-                            <span className="fw-500 text-body">{t("shop.bag_pack")}</span>
+                            <span className="fw-500 text-body">
+                              {t("shop.bag_pack")}
+                            </span>
                             <br />
                             <strong className="text-white font-size-12 fw-bold">
                               QTY:&nbsp;1
@@ -369,7 +378,9 @@ const CheckoutPage = memo(() => {
                         </td>
                       </tr>
                       <tr className="border-bottom">
-                        <td className="ps-0 p-3 fw-500 font-size-18">{t("shop.total")}</td>
+                        <td className="ps-0 p-3 fw-500 font-size-18">
+                          {t("shop.total")}
+                        </td>
                         <td className="pe-0 p-3 fw-500 text-end">
                           <span className="text-primary mb-0">$71.00</span>
                         </td>
@@ -492,7 +503,10 @@ const CheckoutPage = memo(() => {
                     </div>
                     <p className="mt-3 mb-5">
                       {t("shop.your_personal_data")}{" "}
-                      <Link to="/PrivacyPolicy">{t("shop.privacy_policy")}</Link>.
+                      <Link to="/PrivacyPolicy">
+                        {t("shop.privacy_policy")}
+                      </Link>
+                      .
                     </p>
                     <CustomButton
                       buttonTitle={t("shop.place_order")}

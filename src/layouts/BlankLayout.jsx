@@ -4,7 +4,6 @@ import { Fragment, Suspense } from "react";
 import { Outlet } from "react-router-dom";
 
 import Loader from "../components/Loader";
-import SettingOffCanvas from "../components/setting/SettingOffCanvas";
 
 const BlankLayout = () => {
   return (
@@ -12,7 +11,6 @@ const BlankLayout = () => {
       <Suspense fallback={<Loader></Loader>}>
         <Outlet></Outlet>
       </Suspense>
-      <SettingOffCanvas />
     </Fragment>
   );
 };

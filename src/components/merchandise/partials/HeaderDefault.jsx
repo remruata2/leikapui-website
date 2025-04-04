@@ -39,11 +39,10 @@ const HeaderMerchandise = memo(() => {
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
 
-    if (lng === 'ar') {
-      dispatch(theme_scheme_direction('rtl'))
-    }
-    else {
-      dispatch(theme_scheme_direction('ltr'))
+    if (lng === "ar") {
+      dispatch(theme_scheme_direction("rtl"));
+    } else {
+      dispatch(theme_scheme_direction("ltr"));
     }
   };
 
@@ -99,9 +98,9 @@ const HeaderMerchandise = memo(() => {
       }
     }
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -407,7 +406,11 @@ const HeaderMerchandise = memo(() => {
               </Row>
             </Container>
           </div>
-          <div className={`header-bottom header-sticky ${isSticky ? 'sticky' : ''}`}>
+          <div
+            className={`header-bottom header-sticky ${
+              isSticky ? "sticky" : ""
+            }`}
+          >
             <Navbar
               expand="xl"
               className="nav navbar-light iq-navbar header-hover-menu py-xl-0"
@@ -440,8 +443,9 @@ const HeaderMerchandise = memo(() => {
                   </div>
                   <Navbar
                     expand="xl"
-                    className={`offcanvas mobile-offcanvas nav hover-nav horizontal-nav py-xl-0 ${show2 === true ? "show" : ""
-                      } `}
+                    className={`offcanvas mobile-offcanvas nav hover-nav horizontal-nav py-xl-0 ${
+                      show2 === true ? "show" : ""
+                    } `}
                     style={{
                       visibility: `${show2 === true ? "visible" : "hidden"}`,
                     }}
@@ -461,15 +465,16 @@ const HeaderMerchandise = memo(() => {
                             aria-expanded={open}
                             href="#homePages"
                             onClick={() => setOpen(!open)}
-                            className={`${location.pathname === "/merchandise-store" ||
+                            className={`${
+                              location.pathname === "/merchandise-store" ||
                               location.pathname === "/" ||
                               location.pathname === "/home" ||
                               location.pathname === "/movies" ||
                               location.pathname === "/tv-shows" ||
                               location.pathname === "/videos"
-                              ? "active"
-                              : ""
-                              }`}
+                                ? "active"
+                                : ""
+                            }`}
                           >
                             <span className="item-name">
                               {t("header.home")}
@@ -496,8 +501,9 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/"
-                                  className={`${location.pathname === "/" ? "active" : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/" ? "active" : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.ott_home")}{" "}
@@ -506,10 +512,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/home"
-                                  className={`${location.pathname === "/home"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/home"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.home")}{" "}
@@ -518,10 +525,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/movies"
-                                  className={`${location.pathname === "/movies"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/movies"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.movie")}{" "}
@@ -530,10 +538,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/tv-shows"
-                                  className={`${location.pathname === "/tv-shows"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/tv-shows"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.tv_show")}{" "}
@@ -542,10 +551,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/videos"
-                                  className={`${location.pathname === "/videos"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/videos"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.video")}{" "}
@@ -554,10 +564,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/merchandise-store"
-                                  className={`${location.pathname === "/merchandise-store"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/merchandise-store"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.merchandise_store")}{" "}
@@ -600,10 +611,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/restricted-content"
-                                  className={`${location.pathname === "/restricted-content"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/restricted-content"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.restricted_content")}{" "}
@@ -612,10 +624,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/related-merchandise"
-                                  className={`${location.pathname === "/related-merchandise"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/related-merchandise"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.related_merchandise")}{" "}
@@ -624,10 +637,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/playlist"
-                                  className={`${location.pathname === "/playlist"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/playlist"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.playlist")}{" "}
@@ -636,10 +650,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/geners"
-                                  className={`${location.pathname === "/geners"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/geners"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.geners")}{" "}
@@ -648,10 +663,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/cast"
-                                  className={`${location.pathname === "/cast"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/cast"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.cast")}{" "}
@@ -660,10 +676,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/tags"
-                                  className={`${location.pathname === "/tags"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/tags"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.tags")}{" "}
@@ -677,15 +694,16 @@ const HeaderMerchandise = memo(() => {
                             aria-expanded={open2}
                             href="#homePages"
                             onClick={() => setOpen2(!open2)}
-                            className={`${location.pathname === "/about-us" ||
+                            className={`${
+                              location.pathname === "/about-us" ||
                               location.pathname === "/contact-us" ||
                               location.pathname === "/fa1" ||
                               location.pathname === "/PrivacyPolicy" ||
                               location.path === "/pricing" ||
                               location.pathname === "/coming-soon"
-                              ? "active"
-                              : ""
-                              }`}
+                                ? "active"
+                                : ""
+                            }`}
                           >
                             <span className="item-name">
                               {t("header.pages")}
@@ -808,7 +826,8 @@ const HeaderMerchandise = memo(() => {
                             aria-expanded={open4}
                             href="#homePages"
                             onClick={() => setOpen4(!open4)}
-                            className={`${location.pathname === "/blogs" ||
+                            className={`${
+                              location.pathname === "/blogs" ||
                               location.pathname === "/blogs/single" ||
                               location.pathname === "/blogs/double" ||
                               location.pathname === "/blogs/large-grid" ||
@@ -822,9 +841,9 @@ const HeaderMerchandise = memo(() => {
                               location.pathname === "/blog-single/link" ||
                               location.pathname === "/blog-single/quote" ||
                               location.pathname === "/blog-single/gallery"
-                              ? "active"
-                              : ""
-                              }`}
+                                ? "active"
+                                : ""
+                            }`}
                           >
                             <span className="item-name">
                               {t("header.blog")}
@@ -854,10 +873,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/blogs"
-                                  className={`${location.pathname === "/blogs"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/blogs"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.listing")}{" "}
@@ -868,13 +888,14 @@ const HeaderMerchandise = memo(() => {
                                   aria-expanded={open5}
                                   href="#homePages"
                                   onClick={() => setOpen5(!open5)}
-                                  className={`${location.pathname === "/blogs/single" ||
+                                  className={`${
+                                    location.pathname === "/blogs/single" ||
                                     location.pathname === "/blogs/double" ||
                                     location.pathname === "/blogs/large-grid" ||
                                     location.pathname === "/blogs/small-grid"
-                                    ? "active"
-                                    : ""
-                                    }`}
+                                      ? "active"
+                                      : ""
+                                  }`}
                                 >
                                   <span className="item-name">
                                     {t("header.blog_grid")}
@@ -904,10 +925,11 @@ const HeaderMerchandise = memo(() => {
                                     <Nav.Item as="li">
                                       <Link
                                         to="/blogs/single"
-                                        className={`${location.pathname === "/blogs/single"
-                                          ? "active"
-                                          : ""
-                                          } nav-link`}
+                                        className={`${
+                                          location.pathname === "/blogs/single"
+                                            ? "active"
+                                            : ""
+                                        } nav-link`}
                                       >
                                         {" "}
                                         1 {t("header.column")}{" "}
@@ -916,10 +938,11 @@ const HeaderMerchandise = memo(() => {
                                     <Nav.Item as="li">
                                       <Link
                                         to="/blogs/double"
-                                        className={`${location.pathname === "/blogs/double"
-                                          ? "active"
-                                          : ""
-                                          } nav-link`}
+                                        className={`${
+                                          location.pathname === "/blogs/double"
+                                            ? "active"
+                                            : ""
+                                        } nav-link`}
                                       >
                                         {" "}
                                         2 {t("header.column")}
@@ -928,11 +951,12 @@ const HeaderMerchandise = memo(() => {
                                     <Nav.Item as="li">
                                       <Link
                                         to="/blogs/large-grid"
-                                        className={`${location.pathname ===
+                                        className={`${
+                                          location.pathname ===
                                           "/blogs/large-grid"
-                                          ? "active"
-                                          : ""
-                                          } nav-link`}
+                                            ? "active"
+                                            : ""
+                                        } nav-link`}
                                       >
                                         {" "}
                                         3 {t("header.column")}{" "}
@@ -941,11 +965,12 @@ const HeaderMerchandise = memo(() => {
                                     <Nav.Item as="li">
                                       <Link
                                         to="/blogs/small-grid"
-                                        className={`${location.pathname ===
+                                        className={`${
+                                          location.pathname ===
                                           "/blogs/small-grid"
-                                          ? "active"
-                                          : ""
-                                          } nav-link`}
+                                            ? "active"
+                                            : ""
+                                        } nav-link`}
                                       >
                                         {" "}
                                         4 {t("header.column")}{" "}
@@ -959,12 +984,13 @@ const HeaderMerchandise = memo(() => {
                                   aria-expanded={open6}
                                   href="#homePages"
                                   onClick={() => setOpen6(!open6)}
-                                  className={`${location.pathname ===
-                                    "/blogs-sidebar/left" ||
+                                  className={`${
+                                    location.pathname ===
+                                      "/blogs-sidebar/left" ||
                                     location.pathname === "/blog-sidebar/right"
-                                    ? "active"
-                                    : ""
-                                    }`}
+                                      ? "active"
+                                      : ""
+                                  }`}
                                 >
                                   <span className="item-name">
                                     {t("header.blog_sidebar")}
@@ -994,11 +1020,12 @@ const HeaderMerchandise = memo(() => {
                                     <Nav.Item as="li">
                                       <Link
                                         to="/blogs-sidebar/left"
-                                        className={`${location.pathname ===
+                                        className={`${
+                                          location.pathname ===
                                           "/blog-sidebar/left"
-                                          ? "active"
-                                          : ""
-                                          } nav-link`}
+                                            ? "active"
+                                            : ""
+                                        } nav-link`}
                                       >
                                         {" "}
                                         {t("header.left_sidebar")}{" "}
@@ -1007,11 +1034,12 @@ const HeaderMerchandise = memo(() => {
                                     <Nav.Item as="li">
                                       <Link
                                         to="/blogs-sidebar/right"
-                                        className={`${location.pathname ===
+                                        className={`${
+                                          location.pathname ===
                                           "/blog-sidebar/right"
-                                          ? "active"
-                                          : ""
-                                          } nav-link`}
+                                            ? "active"
+                                            : ""
+                                        } nav-link`}
                                       >
                                         {" "}
                                         {t("header.right_sidebar")}{" "}
@@ -1025,19 +1053,20 @@ const HeaderMerchandise = memo(() => {
                                   aria-expanded={open7}
                                   href="#homePages"
                                   onClick={() => setOpen7(!open7)}
-                                  className={`${location.pathname === "/blog-template" ||
+                                  className={`${
+                                    location.pathname === "/blog-template" ||
                                     location.pathname === "/blogs-detail" ||
                                     location.pathname ===
-                                    "/blog-single/audio" ||
+                                      "/blog-single/audio" ||
                                     location.pathname ===
-                                    "/blog-single/video" ||
+                                      "/blog-single/video" ||
                                     location.pathname === "/blog-single/link" ||
                                     location.pathname ===
-                                    "/blog-single/quote" ||
+                                      "/blog-single/quote" ||
                                     location.pathname === "/blog-single/gallery"
-                                    ? "active"
-                                    : ""
-                                    }`}
+                                      ? "active"
+                                      : ""
+                                  }`}
                                 >
                                   <span className="item-name">
                                     {t("header.blog_single")}
@@ -1067,10 +1096,11 @@ const HeaderMerchandise = memo(() => {
                                     <Nav.Item as="li">
                                       <Link
                                         to="/blog-template"
-                                        className={`${location.pathname === "/blog-template"
-                                          ? "active"
-                                          : ""
-                                          } nav-link`}
+                                        className={`${
+                                          location.pathname === "/blog-template"
+                                            ? "active"
+                                            : ""
+                                        } nav-link`}
                                       >
                                         {" "}
                                         {t("header.blog_template")}{" "}
@@ -1079,10 +1109,11 @@ const HeaderMerchandise = memo(() => {
                                     <Nav.Item as="li">
                                       <Link
                                         to="/blogs-detail"
-                                        className={`${location.pathname === "/blogs-detail"
-                                          ? "active"
-                                          : ""
-                                          } nav-link`}
+                                        className={`${
+                                          location.pathname === "/blogs-detail"
+                                            ? "active"
+                                            : ""
+                                        } nav-link`}
                                       >
                                         {" "}
                                         {t("header.standard")}{" "}
@@ -1091,11 +1122,12 @@ const HeaderMerchandise = memo(() => {
                                     <Nav.Item as="li">
                                       <Link
                                         to="/blog-single/audio"
-                                        className={`${location.pathname ===
+                                        className={`${
+                                          location.pathname ===
                                           "/blog-single/audio"
-                                          ? "active"
-                                          : ""
-                                          } nav-link`}
+                                            ? "active"
+                                            : ""
+                                        } nav-link`}
                                       >
                                         {" "}
                                         {t("header.audio")}{" "}
@@ -1104,11 +1136,12 @@ const HeaderMerchandise = memo(() => {
                                     <Nav.Item as="li">
                                       <Link
                                         to="/blog-single/video"
-                                        className={`${location.pathname ===
+                                        className={`${
+                                          location.pathname ===
                                           "/blog-single/video"
-                                          ? "active"
-                                          : ""
-                                          } nav-link`}
+                                            ? "active"
+                                            : ""
+                                        } nav-link`}
                                       >
                                         {" "}
                                         {t("header.video")}{" "}
@@ -1117,11 +1150,12 @@ const HeaderMerchandise = memo(() => {
                                     <Nav.Item as="li">
                                       <Link
                                         to="/blog-single/link"
-                                        className={`${location.pathname ===
+                                        className={`${
+                                          location.pathname ===
                                           "/blog-single/link"
-                                          ? "active"
-                                          : ""
-                                          } nav-link`}
+                                            ? "active"
+                                            : ""
+                                        } nav-link`}
                                       >
                                         {" "}
                                         {t("header.link")}{" "}
@@ -1130,11 +1164,12 @@ const HeaderMerchandise = memo(() => {
                                     <Nav.Item as="li">
                                       <Link
                                         to="/blog-single/quote"
-                                        className={`${location.pathname ===
+                                        className={`${
+                                          location.pathname ===
                                           "/blog-single/quote"
-                                          ? "active"
-                                          : ""
-                                          } nav-link`}
+                                            ? "active"
+                                            : ""
+                                        } nav-link`}
                                       >
                                         {" "}
                                         {t("header.quote")}{" "}
@@ -1143,11 +1178,12 @@ const HeaderMerchandise = memo(() => {
                                     <Nav.Item as="li">
                                       <Link
                                         to="/blog-single/gallery"
-                                        className={`${location.pathname ===
+                                        className={`${
+                                          location.pathname ===
                                           "/blog-single/gallery"
-                                          ? "active"
-                                          : ""
-                                          } nav-link`}
+                                            ? "active"
+                                            : ""
+                                        } nav-link`}
                                       >
                                         {" "}
                                         {t("header.gallery")}{" "}
@@ -1164,15 +1200,16 @@ const HeaderMerchandise = memo(() => {
                             aria-expanded={open8}
                             href="#homePages"
                             onClick={() => setOpen8(!open8)}
-                            className={`${location.pathname === "/shop" ||
+                            className={`${
+                              location.pathname === "/shop" ||
                               location.pathname === "/account" ||
                               location.pathname === "/cart" ||
                               location.pathname === "/wishlist" ||
                               location.pathname === "/checkout" ||
                               location.pathname === "/track-order"
-                              ? "active"
-                              : ""
-                              }`}
+                                ? "active"
+                                : ""
+                            }`}
                           >
                             <span className="item-name">
                               {t("header.shop")}
@@ -1202,10 +1239,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/shop"
-                                  className={`${location.pathname === "/shop"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/shop"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.shop")}{" "}
@@ -1214,10 +1252,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/account"
-                                  className={`${location.pathname === "/account"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/account"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.my_account_page")}{" "}
@@ -1226,10 +1265,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/cart"
-                                  className={`${location.pathname === "/cart"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/cart"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.cart_page")}{" "}
@@ -1238,10 +1278,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/wishlist"
-                                  className={`${location.pathname === "/wishlist"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/wishlist"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.wishlist_page")}{" "}
@@ -1250,10 +1291,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/checkout"
-                                  className={`${location.pathname === "/checkout"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/checkout"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.checkout_page")}{" "}
@@ -1262,10 +1304,11 @@ const HeaderMerchandise = memo(() => {
                               <Nav.Item as="li">
                                 <Link
                                   to="/track-order"
-                                  className={`${location.pathname === "/track-order"
-                                    ? "active"
-                                    : ""
-                                    } nav-link`}
+                                  className={`${
+                                    location.pathname === "/track-order"
+                                      ? "active"
+                                      : ""
+                                  } nav-link`}
                                 >
                                   {" "}
                                   {t("header.order_tracking")}{" "}
@@ -1421,8 +1464,9 @@ const HeaderMerchandise = memo(() => {
                       </span>
                     </Button>
                     <div
-                      className={`p-3 navbar-collapse ${show1 === true ? "collapse show" : "collapse"
-                        }`}
+                      className={`p-3 navbar-collapse ${
+                        show1 === true ? "collapse show" : "collapse"
+                      }`}
                       id="navbarSupportedContent"
                     >
                       <div className="iq-meta-menu-container d-xl-block d-none">
