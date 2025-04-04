@@ -77,9 +77,9 @@ const YourFavouritePersonality = memo((props) => {
   return (
     <Fragment>
       <SectionSlider
-        title={t("ott_home.personality")}
+        title={t("ott_home.favorite_personality")}
         list={personality}
-        className="streamit-block"
+        className="leikapui-block"
         slidesPerView={11}
         link="/cast-view-all"
         // loop={true}

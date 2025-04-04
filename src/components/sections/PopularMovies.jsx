@@ -51,9 +51,9 @@ const PopularMovies = memo((props) => {
         }`}
       >
         <SectionSlider
-          title={t("Movies")}
+          title={t("ott_home.popular_movies")}
           list={movies}
-          className="popular-movies-block streamit-block"
+          className="popular-movies-block leikapui-block"
           viewAll="/movies"
           paddingY={props.paddingY}
         >

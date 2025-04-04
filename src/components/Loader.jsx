@@ -1,7 +1,7 @@
 import { Fragment, memo } from "react";
 
 // img
-import LoaderGif from '/assets/images/loader.gif'
+import LoaderGif from "/assets/images/logo.png";
 
 const Loader = memo(() => {
   return (
@@ -10,9 +10,9 @@ const Loader = memo(() => {
         <div className="loader-body">
           <img
             src={LoaderGif}
-            alt="loader"
-            className="img-fluid"
-            width="300"
+            alt="Leikapui"
+            className="img-fluid animate-pulse"
+            width="200"
           />
         </div>
       </div>

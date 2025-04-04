@@ -16,18 +16,18 @@ const BestOfInternationalShows = memo((props) => {
   return (
     <Fragment>
       <SectionSlider
-        title={t("form.international_shows")}
+        title={t("ott_home.best_international")}
         list={latestMovie}
-        className="recommended-block section-top-spacing streamit-block"
+        className="recommended-block section-top-spacing leikapui-block"
         slideMedium={props.slideMedium}
         paddingY={props.paddingY}
-      // loop={true}
+        // loop={true}
       >
         {(data) => (
           <CardStyle
             image={data.image}
-            title={data.title}
-            movieTime={data.movieTime}
+            title={t(data.title)}
+            movieTime={t(data.movieTime)}
             watchlistLink="/playlist"
             link="/movies-detail"
           />

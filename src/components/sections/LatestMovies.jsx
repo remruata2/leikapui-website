@@ -16,12 +16,12 @@ const LatestMovies = (props) => {
   return (
     <Fragment>
       <SectionSlider
-        title={t("home.latest_movies")}
+        title={t("ott_home.latest_movies")}
         list={latestMovie}
-        className="latest-block streamit-block"
+        className="latest-block leikapui-block"
         slidesPerView="6"
         paddingY={props.paddingY}
-      // loop={true}
+        // loop={true}
       >
         {(data) => (
           <CardStyle

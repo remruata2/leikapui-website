@@ -1,6 +1,7 @@
-.streamit-block .swiper-wrapper {
-  margin: 0 !important;
+.leikapui-block .swiper-wrapper {
+  padding-bottom: 30px;
 }
+
 .top-ten-block .swiper-wrapper {
   margin-bottom: 3rem;
 }
