@@ -63,7 +63,6 @@ const FrontendLayout = memo((props) => {
           <i className="fa-solid fa-chevron-up"></i>
         </Link>
       </div>
-      <SettingOffCanvas />
     </Fragment>
   );
 });
