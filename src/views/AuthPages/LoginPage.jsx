@@ -88,7 +88,7 @@ const LoginPage = memo(() => {
   return (
     <div className="login-page">
       <div className="login-container">
-        {/* Left Column - Image/Branding */}
+        {/* Left Column - Image/Branding - Hidden on mobile */}
         <div className="login-left">
           <div className="login-left-content">
             <Logo className="large-logo" />
@@ -100,6 +100,9 @@ const LoginPage = memo(() => {
         {/* Right Column - Login Form */}
         <div className="login-right">
           <div className="login-form-container">
+            <div className="mobile-logo-container">
+              <Logo className="mobile-logo" />
+            </div>
             <h1 className="login-title">Welcome Back!</h1>
             <p className="login-subtitle">Sign in to continue your journey</p>
 
