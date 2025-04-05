@@ -228,10 +228,12 @@ const DetailPage = memo(() => {
       responsive: true,
       fluid: true,
       techOrder: ["youtube"],
-      sources: [{
-        type: "video/youtube",
-        src: `https://www.youtube.com/watch?v=${trailerUrl}`,
-      }],
+      sources: [
+        {
+          type: "video/youtube",
+          src: `https://www.youtube.com/watch?v=${trailerUrl}`,
+        },
+      ],
       youtube: {
         iv_load_policy: 1,
         modestbranding: 1,
@@ -245,7 +247,6 @@ const DetailPage = memo(() => {
 
     console.log("Setting video options:", videoOptions);
     setVideoJsOptions(videoOptions);
-
   }, [trailerUrl]);
 
   useEffect(() => {
@@ -767,7 +768,7 @@ const DetailPage = memo(() => {
                       </div>
 
                       {/* Subscription status */}
-                      {hasPaid && (
+                      {/* {hasPaid && (
                         <div className="alert alert-info" role="alert">
                           <i className="fas fa-clock me-2"></i>
                           {remainingTime
@@ -776,7 +777,7 @@ const DetailPage = memo(() => {
                               )}`
                             : "Checking access status..."}
                         </div>
-                      )}
+                      )} */}
                       {hasPaid ? (
                         <div className="d-flex flex-column">
                           <button
