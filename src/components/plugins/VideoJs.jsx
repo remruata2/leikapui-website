@@ -1,6 +1,8 @@
 import React from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
+// Import YouTube tech
+import "videojs-youtube";
 
 export const VideoJS = (props) => {
   const videoRef = React.useRef(null);
@@ -16,16 +18,26 @@ export const VideoJS = (props) => {
       videoElement.classList.add("vjs-big-play-centered");
       videoRef.current.appendChild(videoElement);
 
-      const player = (playerRef.current = videojs(videoElement, options, () => {
+      // Add YouTube tech to the player
+      const player = (playerRef.current = videojs(videoElement, {
+        ...options,
+        techOrder: ["youtube"],
+        forceSSL: true,
+        youtube: {
+          ...options.youtube,
+          iv_load_policy: 1,
+          modestbranding: 1,
+          rel: 0,
+          showinfo: 0,
+          playsinline: 1
+        }
+      }, () => {
         videojs.log("player is ready");
         onReady && onReady(player);
       }));
 
-      // You could update an existing player in the `else` block here
-      // on prop change, for example:
     } else {
       const player = playerRef.current;
-
       player.autoplay(options.autoplay);
       player.src(options.sources);
     }
@@ -44,8 +56,8 @@ export const VideoJS = (props) => {
   }, [playerRef]);
 
   return (
-    <div data-vjs-player>
-      <div ref={videoRef} />
+    <div data-vjs-player style={{ width: "100%", ...style }}>
+      <div ref={videoRef} style={{ width: "100%", height: "100%" }} />
     </div>
   );
 };

@@ -5,7 +5,17 @@ import { Col, Container, Nav, Row, Tab } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import VideoJS from "../../components/plugins/VideoJs";
 import VideoPlayerIframe from "../../components/VideoPlayerIframe";
-import { FaCartPlus } from "react-icons/fa";
+import {
+  FaCartPlus,
+  FaHeart,
+  FaRegHeart,
+  FaPlay,
+  FaCreditCard,
+  FaSpinner,
+  FaTimes,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa";
 import axios from "axios";
 import Swal from "sweetalert2";
 import PopOutPlayer from "./PopOutPlayer";
@@ -54,7 +64,7 @@ const DetailPage = memo(() => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const [isLoading, setIsLoading] = useState(true);
   const [hasPaid, setHasPaid] = useState(false);
-  const [remainingTime, setRemainingTime] = useState("some time");
+  const [remainingTime, setRemainingTime] = useState("");
   const [userData, setUserData] = useState(null);
   const [videoJsOptions, setVideoJsOptions] = useState([]);
   const [videoJsTrailerOptions, setVideoJsTrailerOptions] = useState([]);
@@ -70,6 +80,8 @@ const DetailPage = memo(() => {
   const dispatch = useDispatch();
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [renderVideo, setRenderVideo] = useState(false);
+
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   // Ensure user data is synchronized with auth state
   useEffect(() => {
@@ -127,18 +139,11 @@ const DetailPage = memo(() => {
       }
 
       // Set trailer URL if available
-      if (movieData.trailer) {
+      if (movieData.trailer_url) {
         // If it's a Bunny.net URL, use as is
-        if (movieData.trailer.includes("mediadelivery.net")) {
-          setTrailerVideoId(movieData.trailer);
-        } else {
-          // Try to extract YouTube ID if it's a YouTube URL
-          const trailerID = movieData.trailer.split("v=")[1]?.split("&")[0];
-          if (trailerID) {
-            setTrailerUrl(trailerID);
-          }
-        }
+        setTrailerUrl(movieData.trailer_url);
       }
+      console.log("Trailer URL:", trailerUrl);
 
       // Check payment status separately if user is authenticated
       if (user) {
@@ -156,15 +161,16 @@ const DetailPage = memo(() => {
           console.log("Purchase check response:", purchaseCheckResponse.data);
 
           if (purchaseCheckResponse.data) {
-            const { success, hasAccess } = purchaseCheckResponse.data;
-            setHasPaid(hasAccess); // Use hasAccess instead of hasPaid
+            const { success, hasAccess, remainingTime } =
+              purchaseCheckResponse.data;
+            setHasPaid(hasAccess);
 
-            // If there's still remainingTime in the response, use it
-            if (purchaseCheckResponse.data.remainingTime) {
-              setRemainingTime(purchaseCheckResponse.data.remainingTime);
+            // If there's remainingTime in the response, use it
+            if (remainingTime) {
+              setRemainingTime(remainingTime);
             } else {
               // Default value or empty string if not provided
-              setRemainingTime("some time");
+              setRemainingTime("");
             }
           }
         } catch (paymentError) {
@@ -195,32 +201,53 @@ const DetailPage = memo(() => {
   }, [fetchData]);
 
   useEffect(() => {
-    setVideoJsOptions({
+    if (!trailerUrl) return;
+
+    // Force reload on mobile devices to clear cache
+    if (isMobile && window.performance) {
+      if (
+        performance.navigation.type === performance.navigation.TYPE_NAVIGATE
+      ) {
+        window.location.reload(true);
+      }
+    }
+
+    const commonOptions = {
       autoplay: false,
       controls: true,
       responsive: true,
+      fluid: true,
       techOrder: ["youtube"],
+      youtube: {
+        iv_load_policy: 1,
+        modestbranding: 1,
+        rel: 0,
+        showinfo: 0,
+        enablejsapi: 1, // Enable JavaScript API
+        origin: window.location.origin, // Set origin for API
+      },
+    };
+
+    // For full movie
+    setVideoJsOptions({
+      ...commonOptions,
       sources: [
         {
-          src: `https://www.youtube.com/watch?v=${trailerUrl}`,
           type: "video/youtube",
+          src: `https://www.youtube.com/watch?v=${trailerUrl}`,
         },
       ],
-      youtube: { iv_load_policy: 1 },
     });
 
+    // For trailer
     setVideoJsTrailerOptions({
-      autoplay: false,
-      controls: true,
-      responsive: true,
-      techOrder: ["youtube"],
+      ...commonOptions,
       sources: [
         {
-          src: `https://www.youtube.com/watch?v=${trailerUrl}` || "", // Use an empty string if trailerUrl is null or undefined
           type: "video/youtube",
+          src: `https://www.youtube.com/watch?v=${trailerUrl}`,
         },
       ],
-      youtube: { iv_load_policy: 1 },
     });
   }, [trailerUrl]);
 
@@ -286,6 +313,65 @@ const DetailPage = memo(() => {
     }
   }, [showVideoModal]);
 
+  useEffect(() => {
+    const fetchLikeCount = async () => {
+      try {
+        const response = await axios.get(
+          `${apiUrl}/api/movies/${movieId}/like-count`
+        );
+        setLikeCount(response.data.likesCount);
+      } catch (error) {
+        console.error("Error fetching like count:", error);
+      }
+    };
+
+    // Fetch like count initially and set up interval
+    fetchLikeCount();
+    const interval = setInterval(fetchLikeCount, 10000); // Refresh every 10 seconds
+
+    return () => clearInterval(interval);
+  }, [apiUrl, movieId]);
+
+  const formatRemainingTime = (timeObj) => {
+    if (!timeObj) return "";
+
+    const { days, hours, minutes } = timeObj;
+    let formattedTime = "";
+    if (days > 0) formattedTime += `${days} day${days > 1 ? "s" : ""} `;
+    if (hours > 0) formattedTime += `${hours} hour${hours > 1 ? "s" : ""} `;
+    if (minutes > 0)
+      formattedTime += `${minutes} minute${minutes > 1 ? "s" : ""}`;
+    if (formattedTime.trim() === "") return "Less than 1 minute";
+    return formattedTime.trim();
+  };
+
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (!user || !isAuthenticated) return;
+
+      try {
+        const response = await axios.get(
+          `${apiUrl}/api/users/${user._id}/subscription-status`
+        );
+        const { remainingTime } = response.data;
+
+        if (remainingTime) {
+          setRemainingTime(formatRemainingTime(remainingTime));
+        } else {
+          setRemainingTime("");
+        }
+      } catch (error) {
+        console.error("Error checking subscription:", error);
+        setRemainingTime("");
+      }
+    };
+
+    checkSubscription();
+    const interval = setInterval(checkSubscription, 60000); // Check every minute
+
+    return () => clearInterval(interval);
+  }, [apiUrl, user, isAuthenticated]);
+
   const castMembers = personDetails.filter((person) => person.type === "cast");
   const crewMembers = personDetails.filter((person) => person.type === "crew");
 
@@ -307,22 +393,22 @@ const DetailPage = memo(() => {
     }
   };
 
-  const handlePlayerReady = useCallback(
-    (player) => {
-      playerRef.current = player;
+  const handlePlayerReady = useCallback((player) => {
+    playerRef.current = player;
 
-      // Add event listener for the 'play' event
-      player.on("play", handlePlayClick);
+    // Add event listener for the 'play' event
+    player.on("play", () => {
+      console.log("Player started");
+    });
 
-      player.on("waiting", () => {
-        videojs.log("player is waiting");
-      });
-      player.on("dispose", () => {
-        videojs.log("player will dispose");
-      });
-    },
-    [handlePlayClick]
-  );
+    player.on("waiting", () => {
+      console.log("Player waiting");
+    });
+
+    player.on("dispose", () => {
+      console.log("Player disposed");
+    });
+  }, []);
 
   const handlePayment = useCallback(async () => {
     try {
@@ -506,7 +592,9 @@ const DetailPage = memo(() => {
             Swal.fire({
               title: "Payment Failed",
               text:
-                error.response?.data?.message || "Payment verification failed",
+                error.response?.data?.message ||
+                error.message ||
+                "Payment verification failed",
               icon: "error",
             });
           } finally {
@@ -551,23 +639,39 @@ const DetailPage = memo(() => {
     }
 
     try {
+      const token = localStorage.getItem("jwtToken");
+      // Use toggle-like endpoint with the same parameters as in MovieDetails.tsx
       const response = await axios.post(
-        `${apiUrl}/api/movies/${movieId}/like`,
+        `${apiUrl}/api/movies/${movieId}/toggle-like`,
         {
           userId: user._id,
+          isLiked: !isLiked,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
-      if (response.data.message === "Like removed successfully") {
-        setIsLiked(false);
-        setLikeCount((prevCount) => prevCount - 1);
-      } else {
-        setIsLiked(true);
-        setLikeCount((prevCount) => prevCount + 1);
+
+      // Update state based on response
+      if (response.data.success) {
+        setIsLiked(response.data.isLiked);
+        setLikeCount((prev) => prev + (response.data.isLiked ? 1 : -1));
       }
     } catch (error) {
       console.error("Error liking the movie:", error);
+      // Handle 401 unauthorized errors
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        navigate("/login", { state: { from: location } });
+        return;
+      }
+      // Show error notification
+      Swal.fire({
+        title: "Error",
+        text: "Failed to update like status",
+        icon: "error",
+      });
     }
-  }, [apiUrl, movieId, user, isAuthenticated, navigate, location]);
+  }, [apiUrl, movieId, user, isAuthenticated, navigate, location, isLiked]);
 
   // Webhook simulation (for testing)
   const simulateWebhook = async (paymentId, status) => {
@@ -580,6 +684,21 @@ const DetailPage = memo(() => {
       console.error("Error simulating webhook:", error);
     }
   };
+
+  const releaseYear = useMemo(() => {
+    // First try release_date field, then fall back to release_year
+    const dateField =
+      selectedMovie?.release_date || selectedMovie?.release_year;
+    if (dateField) {
+      try {
+        return new Date(dateField).getFullYear().toString();
+      } catch (error) {
+        console.error("Error parsing date:", error);
+        return "N/A";
+      }
+    }
+    return "N/A";
+  }, [selectedMovie?.release_date, selectedMovie?.release_year]);
 
   if (isLoading || !selectedMovie) {
     return <div>Loading...</div>;
@@ -594,20 +713,14 @@ const DetailPage = memo(() => {
               <div className="movie-details-container">
                 <div className="movie-details-content">
                   <div className="video-container">
-                    {/* Always show trailer on the page */}
-                    {trailerVideoId ? (
-                      <VideoPlayerIframe
-                        videoId={trailerVideoId}
-                        autoPlay={false}
-                      />
-                    ) : (
-                      <VideoJS
-                        options={videoJsTrailerOptions}
-                        onReady={handlePlayerReady}
-                      />
-                    )}
-                    {/* Show trailer tag */}
-                    <div className="trailer-tag">Trailer</div>
+                    {/* Video player */}
+                    <VideoJS
+                      options={hasPaid ? videoJsOptions : videoJsTrailerOptions}
+                      onReady={handlePlayerReady}
+                      className="video-js vjs-big-play-centered"
+                    />
+                    {/* Show trailer tag if not paid */}
+                    {!hasPaid && <div className="trailer-tag">Trailer</div>}
                   </div>
                 </div>
                 <div className="movie-details-description ml-3">
@@ -620,7 +733,7 @@ const DetailPage = memo(() => {
                       </div>
                       <div className="d-block d-lg-flex align-items-center mb-2">
                         <span className="border border-white p-1">
-                          Release Year: {selectedMovie.release_year}
+                          Release Year: {releaseYear}
                         </span>
                         <span className="ms-3 font-Weight-500 genres-info me-2 border border-white p-1">
                           1hr : 48mins
@@ -637,75 +750,94 @@ const DetailPage = memo(() => {
                       <div className="d-flex align-items-center gap-4 flex-wrap mb-4">
                         <ul className="list-inline p-0 share-icons music-play-lists mb-n2 mx-n2">
                           <li>
-                            <span onClick={handleLikeClick}>
-                              <i
-                                className={`fa-heart ${
-                                  isLiked ? "fa-solid" : "far"
-                                }`}
-                              ></i>
+                            <span
+                              onClick={handleLikeClick}
+                              style={{ cursor: "pointer" }}
+                            >
+                              {isLiked ? (
+                                <FaHeart className="text-primary" size={20} />
+                              ) : (
+                                <FaRegHeart size={20} />
+                              )}
                             </span>
                           </li>
                         </ul>
-                        <span className="text-white">{likeCount} likes</span>
+                        <span className="text-white">
+                          {likeCount > 0
+                            ? `${likeCount} like${likeCount > 1 ? "s" : ""}`
+                            : "Be the first to like"}
+                        </span>
                       </div>
+
+                      {/* Subscription status */}
+                      {hasPaid && (
+                        <div className="alert alert-info" role="alert">
+                          <i className="fas fa-clock me-2"></i>
+                          {remainingTime
+                            ? `Access expires in ${formatRemainingTime(
+                                remainingTime
+                              )}`
+                            : "Checking access status..."}
+                        </div>
+                      )}
+                      {hasPaid ? (
+                        <div className="d-flex flex-column">
+                          <button
+                            className="btn btn-primary btn-watch"
+                            onClick={handlePlayClick}
+                            style={{
+                              width: "fit-content",
+                              padding: "10px 24px",
+                              fontSize: "16px",
+                              fontWeight: "bold",
+                              marginBottom: "20px",
+                            }}
+                          >
+                            <FaPlay className="me-2" /> Watch Now
+                          </button>
+                          {/* Only show remaining time if it's available */}
+                          {remainingTime && (
+                            <span className="mb-3">
+                              You have{" "}
+                              <span className="text-primary fw-bold">
+                                {formatRemainingTime(remainingTime)}
+                              </span>{" "}
+                              to watch this movie
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="d-flex flex-column">
+                          <p className="mb-3">
+                            Rent this movie to watch the full content
+                          </p>
+                          <button
+                            className="btn btn-primary"
+                            onClick={handlePayment}
+                            disabled={paymentLoading}
+                            style={{
+                              width: "fit-content",
+                              padding: "10px 24px",
+                              fontSize: "16px",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {paymentLoading ? (
+                              <>
+                                <FaSpinner className="fa-spin me-2" />{" "}
+                                Processing...
+                              </>
+                            ) : (
+                              <>
+                                <FaCreditCard className="me-2" /> Rent for ₹
+                                {selectedMovie?.ppv_cost}
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      )}
                     </Col>
                   </Row>
-                  {hasPaid ? (
-                    <div className="d-flex flex-column">
-                      <button
-                        className="btn btn-primary btn-watch"
-                        onClick={handlePlayClick}
-                        style={{
-                          width: "fit-content",
-                          padding: "10px 24px",
-                          fontSize: "16px",
-                          fontWeight: "bold",
-                          marginBottom: "20px",
-                        }}
-                      >
-                        <i className="fa fa-play me-2"></i> Watch Now
-                      </button>
-                      {/* Only show remaining time if it's available */}
-                      {remainingTime && (
-                        <span className="mb-3">
-                          You have{" "}
-                          <span className="text-primary fw-bold">
-                            {remainingTime}
-                          </span>{" "}
-                          to watch this movie
-                        </span>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="d-flex flex-column">
-                      <p className="mb-3">
-                        Rent this movie to watch the full content
-                      </p>
-                      <button
-                        className="btn btn-primary"
-                        onClick={handlePayment}
-                        disabled={paymentLoading}
-                        style={{
-                          width: "fit-content",
-                          padding: "10px 24px",
-                          fontSize: "16px",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {paymentLoading ? (
-                          <>
-                            <i className="fa fa-spinner fa-spin me-2"></i>{" "}
-                            Processing...
-                          </>
-                        ) : (
-                          <>
-                            <i className="fa fa-credit-card me-2"></i> Rent for
-                            ₹{selectedMovie?.ppv_cost}
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  )}
                   <Row>
                     <div className="details-part content-details trending-info">
                       <Tab.Container defaultActiveKey="first">
@@ -811,10 +943,10 @@ const DetailPage = memo(() => {
                                 ))}
                               </Swiper>
                               <div className="cast-prev swiper-button">
-                                <i className="fa fa-chevron-left"></i>
+                                <FaChevronLeft />
                               </div>
                               <div className="cast-next swiper-button">
-                                <i className="fa fa-chevron-right"></i>
+                                <FaChevronRight />
                               </div>
                             </div>
                           </Tab.Pane>
@@ -863,10 +995,10 @@ const DetailPage = memo(() => {
                                 ))}
                               </Swiper>
                               <div className="crew-prev swiper-button">
-                                <i className="fa fa-chevron-left"></i>
+                                <FaChevronLeft />
                               </div>
                               <div className="crew-next swiper-button">
-                                <i className="fa fa-chevron-right"></i>
+                                <FaChevronRight />
                               </div>
                             </div>
                           </Tab.Pane>
@@ -913,7 +1045,7 @@ const DetailPage = memo(() => {
               zIndex: 10000,
             }}
           >
-            <i className="fa fa-times"></i>
+            <FaTimes />
           </div>
           <div
             className="modal-content"

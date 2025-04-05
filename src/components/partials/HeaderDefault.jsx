@@ -33,6 +33,7 @@ import {
   FaTv,
   FaFilm,
   FaSignInAlt,
+  FaSync,
 } from "react-icons/fa";
 
 // the hook
@@ -223,21 +224,7 @@ const HeaderDefault = memo((props) => {
                         <span className="item-name">{t("header.movie")}</span>
                       </Nav.Link>
                     </Nav.Item>
-                    <Nav.Item as="li">
-                      <Nav.Link
-                        as={Link}
-                        to="/tv-shows"
-                        className={`${
-                          location.pathname === "/tv-shows" ? "active" : ""
-                        }`}
-                        onClick={() => setShow1(false)}
-                      >
-                        <div className="menu-icon-wrapper">
-                          <FaTv />
-                        </div>
-                        <span className="item-name">{t("Series")}</span>
-                      </Nav.Link>
-                    </Nav.Item>
+
                     {isAuthenticated ? (
                       <>
                         <Nav.Item as="li">
@@ -322,6 +309,24 @@ const HeaderDefault = memo((props) => {
                   </ul>
                 </Container>
               </Navbar>
+              <div className="d-flex align-items-center">
+                {/* Add refresh button */}
+                <button
+                  onClick={() => window.location.reload(true)}
+                  className="btn btn-link text-white me-3"
+                  title="Hard Refresh"
+                  style={{
+                    fontSize: "1.2rem",
+                    padding: "0.5rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <FaSync />
+                </button>
+                {/* Existing header content */}
+              </div>
             </div>
           </Container>
         </Navbar>

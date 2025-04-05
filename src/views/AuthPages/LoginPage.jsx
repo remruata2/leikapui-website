@@ -1,7 +1,8 @@
 import React, { memo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import Logo from "../../components/logo";
+import { FaArrowLeft } from "react-icons/fa";
 import { authenticateWithBackend } from "../../utilities/authUtils";
 import "./LoginPage.css";
 
@@ -74,6 +75,18 @@ const LoginPage = memo(() => {
             </div>
             <h1 className="login-title">Login</h1>
             <p className="login-subtitle">Sign in to continue your journey</p>
+
+            <Link
+              to="/"
+              className="d-flex align-items-center mb-4 text-primary"
+              style={{
+                gap: "0.5rem",
+                fontSize: "1rem",
+                textDecoration: "none",
+              }}
+            >
+              <FaArrowLeft /> Back to Home
+            </Link>
 
             <div className="auth-buttons">
               <GoogleOAuthProvider clientId={clientId}>

@@ -117,6 +117,12 @@
   .cast-slider-container {
     padding: 0 32px;
   }
+
+  .trending-text.fw-bold {
+    font-size: 1.5rem;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
 }
 
 .coming-soon-notice {
@@ -138,4 +144,13 @@
   color: #fff;
   margin: 0;
   opacity: 0.8;
+}
+
+/* Responsive title styling */
+@media (max-width: 768px) {
+  .trending-text.fw-bold {
+    font-size: 1.5rem;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
 }

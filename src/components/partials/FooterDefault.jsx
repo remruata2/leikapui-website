@@ -17,6 +17,8 @@ import desktopIcon from "../../assets/images/platforms/desktop-icon.svg";
 // the hook
 import { useTranslation } from "react-i18next";
 
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
 const FooterDefault = memo(() => {
   const { t } = useTranslation();
   const [animationClass, setAnimationClass] = useState("animate__fadeIn");
@@ -52,28 +54,11 @@ const FooterDefault = memo(() => {
         <footer className="footer footer-default">
           <Container fluid>
             <div className="footer-top">
-              <Row className="space-between">
-                {/* Company Info Column */}
-                <Col xl={3} md={4} lg={3} className="mb-5 mb-lg-0">
-                  <div className="footer-logo">
-                    <Logo></Logo>
-                  </div>
-                  <p className="mb-4 font-size-14">
-                    {t("footer.email_us")}:{" "}
-                    <span className="text-white">
-                      support@leikapuistudios.com
-                    </span>
-                  </p>
-                  <p className="text-uppercase letter-spacing-1 font-size-14 mb-1">
-                    {t("footer.customer_services")}
-                  </p>
-                  <p className="mb-0 contact text-white">+ (91) 7005584288</p>
-                </Col>
-
+              <Row className="space-between gx-5">
                 {/* Downloads Section */}
-                <Col xl={4} md={4} lg={4} className="mb-5 mb-lg-0">
-                  <h5 className="text-white mb-4">Download Our App</h5>
-                  <p className="font-size-14 mb-4">
+                <Col xs={12} md={6} className="mb-5 mb-md-0">
+                  <h5 className="text-white mb-4 text-center text-md-start">Download Our App</h5>
+                  <p className="font-size-14 mb-4 text-center text-md-start">
                     Get the best streaming experience on your preferred device
                   </p>
 
@@ -140,55 +125,55 @@ const FooterDefault = memo(() => {
                   </div>
                 </Col>
 
-                {/* Links Column */}
-                <Col xl={4} md={4} lg={4}>
-                  <h5 className="text-white mb-4">Important Links</h5>
-                  <Row>
-                    <Col xs={6}>
-                      <ul className="list-unstyled footer-link-list">
-                        <li className="mb-3">
-                          <Link
-                            to="/privacy-policy"
-                            className="text-white-50 hover-white"
-                          >
-                            {t("footer.privacy-policy")}
-                          </Link>
-                        </li>
-                        <li className="mb-3">
-                          <Link
-                            to="/terms-of-use"
-                            className="text-white-50 hover-white"
-                          >
-                            {t("footer.terms_of_use")}
-                          </Link>
-                        </li>
-                        <li className="mb-3">
-                          <Link
-                            to="/cancellation-refund"
-                            className="text-white-50 hover-white"
-                          >
-                            {t("Cancellation and Refund")}
-                          </Link>
-                        </li>
-                        <li className="mb-3">
-                          <Link
-                            to="/contact-us"
-                            className="text-white-50 hover-white"
-                          >
-                            {t("Contact Us")}
-                          </Link>
-                        </li>
-                      </ul>
-                    </Col>
-                    <Col xs={6}>
-                      <ul className="list-unstyled footer-link-list"></ul>
-                    </Col>
-                  </Row>
-                  <p className="font-size-14 mt-3">
-                    &copy; <span className="currentYear">2025</span>{" "}
-                    <span className="text-primary">Leikapui Studios</span>.{" "}
-                  </p>
-                </Col>
+                {/* Email and Links section - hidden on mobile */}
+                {!isMobile && (
+                  <Col xs={12} md={6} className="ps-md-5">
+                    <h5 className="text-white mb-4 text-center text-md-start">Important Links</h5>
+                    <ul className="list-unstyled footer-link-list">
+                      <li className="mb-3">
+                        <a href="mailto:support@leikapuistudios.com" className="text-white-50 hover-white">
+                          Email Us: support@leikapuistudios.com
+                        </a>
+                      </li>
+                      <li className="mb-3">
+                        <Link
+                          to="/privacy-policy"
+                          className="text-white-50 hover-white"
+                        >
+                          {t("footer.privacy-policy")}
+                        </Link>
+                      </li>
+                      <li className="mb-3">
+                        <Link
+                          to="/terms-of-use"
+                          className="text-white-50 hover-white"
+                        >
+                          {t("footer.terms_of_use")}
+                        </Link>
+                      </li>
+                      <li className="mb-3">
+                        <Link
+                          to="/cancellation-refund"
+                          className="text-white-50 hover-white"
+                        >
+                          {t("Cancellation and Refund")}
+                        </Link>
+                      </li>
+                      <li className="mb-3">
+                        <Link
+                          to="/contact-us"
+                          className="text-white-50 hover-white"
+                        >
+                          {t("Contact Us")}
+                        </Link>
+                      </li>
+                    </ul>
+                    <p className="font-size-14 mt-4 text-center text-md-start">
+                      &copy; <span className="currentYear">2025</span>{" "}
+                      <span className="text-primary">Leikapui Studios</span>.{" "}
+                    </p>
+                  </Col>
+                )}
               </Row>
             </div>
           </Container>
