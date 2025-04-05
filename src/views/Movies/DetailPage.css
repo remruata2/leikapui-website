@@ -18,6 +18,27 @@
   text-overflow: ellipsis;
 }
 
+/* Video container styles */
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  background: #000;
+}
+
+.video-container .video-js {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.video-js.vjs-big-play-centered {
+  width: 100%;
+  height: 100%;
+}
+
 .cast-slider-container {
   position: relative;
   padding: 0 40px;

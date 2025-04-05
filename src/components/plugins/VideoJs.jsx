@@ -18,28 +18,23 @@ export const VideoJS = (props) => {
       videoElement.classList.add("vjs-big-play-centered");
       videoRef.current.appendChild(videoElement);
 
-      // Add YouTube tech to the player
-      const player = (playerRef.current = videojs(videoElement, {
-        ...options,
-        techOrder: ["youtube"],
-        forceSSL: true,
-        youtube: {
-          ...options.youtube,
-          iv_load_policy: 1,
-          modestbranding: 1,
-          rel: 0,
-          showinfo: 0,
-          playsinline: 1
-        }
-      }, () => {
-        videojs.log("player is ready");
+      const player = (playerRef.current = videojs(videoElement, options, () => {
+        console.log("player is ready with options:", options);
         onReady && onReady(player);
       }));
 
+      // Add error handling
+      player.on('error', function() {
+        console.error('Video.js Error:', player.error());
+      });
+
     } else {
       const player = playerRef.current;
-      player.autoplay(options.autoplay);
-      player.src(options.sources);
+
+      // Update player options
+      if (options.sources && options.sources.length > 0) {
+        player.src(options.sources);
+      }
     }
   }, [options, videoRef]);
 

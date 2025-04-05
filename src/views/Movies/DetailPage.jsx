@@ -66,8 +66,7 @@ const DetailPage = memo(() => {
   const [hasPaid, setHasPaid] = useState(false);
   const [remainingTime, setRemainingTime] = useState("");
   const [userData, setUserData] = useState(null);
-  const [videoJsOptions, setVideoJsOptions] = useState([]);
-  const [videoJsTrailerOptions, setVideoJsTrailerOptions] = useState([]);
+  const [videoJsOptions, setVideoJsOptions] = useState({});
   const [trailerUrl, setTrailerUrl] = useState(null);
   const [trailerVideoId, setTrailerVideoId] = useState(null);
   const [videoId, setVideoId] = useState(null);
@@ -140,10 +139,9 @@ const DetailPage = memo(() => {
 
       // Set trailer URL if available
       if (movieData.trailer_url) {
-        // If it's a Bunny.net URL, use as is
+        console.log("Setting trailer URL to:", movieData.trailer_url);
         setTrailerUrl(movieData.trailer_url);
       }
-      console.log("Trailer URL:", trailerUrl);
 
       // Check payment status separately if user is authenticated
       if (user) {
@@ -212,44 +210,47 @@ const DetailPage = memo(() => {
       }
     }
 
-    const commonOptions = {
+    // Debug trailer URL changes
+    console.log("Trailer URL state updated:", trailerUrl);
+  }, [trailerUrl, isMobile]);
+
+  useEffect(() => {
+    if (!trailerUrl) {
+      console.log("No trailer URL available yet");
+      return;
+    }
+
+    console.log("Configuring video player with trailer URL:", trailerUrl);
+
+    const videoOptions = {
       autoplay: false,
       controls: true,
       responsive: true,
       fluid: true,
       techOrder: ["youtube"],
+      sources: [{
+        type: "video/youtube",
+        src: `https://www.youtube.com/watch?v=${trailerUrl}`,
+      }],
       youtube: {
         iv_load_policy: 1,
         modestbranding: 1,
         rel: 0,
         showinfo: 0,
-        enablejsapi: 1, // Enable JavaScript API
-        origin: window.location.origin, // Set origin for API
+        playsinline: 1,
+        enablejsapi: 1,
+        origin: window.location.origin,
       },
     };
 
-    // For full movie
-    setVideoJsOptions({
-      ...commonOptions,
-      sources: [
-        {
-          type: "video/youtube",
-          src: `https://www.youtube.com/watch?v=${trailerUrl}`,
-        },
-      ],
-    });
+    console.log("Setting video options:", videoOptions);
+    setVideoJsOptions(videoOptions);
 
-    // For trailer
-    setVideoJsTrailerOptions({
-      ...commonOptions,
-      sources: [
-        {
-          type: "video/youtube",
-          src: `https://www.youtube.com/watch?v=${trailerUrl}`,
-        },
-      ],
-    });
   }, [trailerUrl]);
+
+  useEffect(() => {
+    console.log("Video options updated:", videoJsOptions);
+  }, [videoJsOptions]);
 
   useEffect(() => {
     if (!paymentId || paymentStatus !== "processing") return;
@@ -393,22 +394,17 @@ const DetailPage = memo(() => {
     }
   };
 
-  const handlePlayerReady = useCallback((player) => {
+  const handlePlayerReady = (player) => {
+    console.log("Player is ready");
     playerRef.current = player;
 
-    // Add event listener for the 'play' event
-    player.on("play", () => {
-      console.log("Player started");
-    });
+    // Force player dimensions
+    player.dimensions(640, 360);
 
-    player.on("waiting", () => {
-      console.log("Player waiting");
-    });
-
-    player.on("dispose", () => {
-      console.log("Player disposed");
-    });
-  }, []);
+    // Log player state
+    console.log("Player tech name:", player.techName_);
+    console.log("Player current source:", player.currentSource());
+  };
 
   const handlePayment = useCallback(async () => {
     try {
@@ -713,12 +709,13 @@ const DetailPage = memo(() => {
               <div className="movie-details-container">
                 <div className="movie-details-content">
                   <div className="video-container">
-                    {/* Video player */}
-                    <VideoJS
-                      options={hasPaid ? videoJsOptions : videoJsTrailerOptions}
-                      onReady={handlePlayerReady}
-                      className="video-js vjs-big-play-centered"
-                    />
+                    {trailerUrl && videoJsOptions?.sources?.[0]?.src && (
+                      <VideoJS
+                        options={videoJsOptions}
+                        onReady={handlePlayerReady}
+                        className="video-js vjs-big-play-centered"
+                      />
+                    )}
                     {/* Show trailer tag if not paid */}
                     {!hasPaid && <div className="trailer-tag">Trailer</div>}
                   </div>
