@@ -112,7 +112,7 @@ const DetailPage = memo(() => {
       const movieData = movieResponse.data.data;
       setSelectedMovie(movieData);
 
-      // Set like count - Note the change from likesCount to likeCount
+      // Set like count
       if (likeCountResponse?.data?.success) {
         console.log("Setting like count to:", likeCountResponse.data.likeCount);
         setLikeCount(likeCountResponse.data.likeCount);
@@ -320,27 +320,6 @@ const DetailPage = memo(() => {
       return () => clearTimeout(timer);
     }
   }, [showVideoModal]);
-
-  useEffect(() => {
-    const fetchLikeCount = async () => {
-      try {
-        const response = await axios.get(
-          `${apiUrl}/api/movies/${movieId}/like-count`
-        );
-        console.log("Periodic like count update:", response.data);
-        if (response.data.success) {
-          setLikeCount(response.data.likeCount); // Note: changed from likesCount to likeCount
-        }
-      } catch (error) {
-        console.error("Error fetching like count:", error);
-      }
-    };
-
-    fetchLikeCount();
-    const interval = setInterval(fetchLikeCount, 10000);
-
-    return () => clearInterval(interval);
-  }, [apiUrl, movieId]);
 
   const formatRemainingTime = (timeObj) => {
     if (!timeObj) return "";
@@ -698,7 +677,7 @@ const DetailPage = memo(() => {
       return;
     }
 
-    // Optimistically update UI
+    // Optimistic update
     const newIsLiked = !isLiked;
     setIsLiked(newIsLiked);
     setLikeCount((prev) => prev + (newIsLiked ? 1 : -1));

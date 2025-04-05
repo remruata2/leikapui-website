@@ -135,6 +135,13 @@
   text-decoration: underline;
 }
 
+.back-to-home-link {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  z-index: 1000;
+}
+
 /* Mobile Styles */
 @media (max-width: 768px) {
   .login-page {

@@ -57,6 +57,19 @@ const LoginPage = memo(() => {
 
   return (
     <div className="login-page">
+      <div className="back-to-home-link">
+        <Link
+          to="/"
+          className="d-flex align-items-center mb-4 text-primary"
+          style={{
+            gap: "0.5rem",
+            fontSize: "1rem",
+            textDecoration: "none",
+          }}
+        >
+          <FaArrowLeft /> Back to Home
+        </Link>
+      </div>
       <div className="login-container">
         {/* Left Column - Image/Branding - Hidden on mobile */}
         <div className="login-left">
@@ -75,18 +88,6 @@ const LoginPage = memo(() => {
             </div>
             <h1 className="login-title">Login</h1>
             <p className="login-subtitle">Sign in to continue your journey</p>
-
-            <Link
-              to="/"
-              className="d-flex align-items-center mb-4 text-primary"
-              style={{
-                gap: "0.5rem",
-                fontSize: "1rem",
-                textDecoration: "none",
-              }}
-            >
-              <FaArrowLeft /> Back to Home
-            </Link>
 
             <div className="auth-buttons">
               <GoogleOAuthProvider clientId={clientId}>
