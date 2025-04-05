@@ -9,12 +9,18 @@ import PopularMovies from "../../components/sections/PopularMovies";
 //static data
 // import { ottVerticleLatestMovies } from "../../StaticData/data";
 
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
 console.log("Test OttPage renders");
 const HomePage = memo(() => {
   return (
     <Fragment>
-      <OttHeroSlider />
-      <PopularMovies paddingY="my-4" />
+      {!isMobile && (
+        <>
+          <OttHeroSlider />
+          <PopularMovies paddingY="my-4" />
+        </>
+      )}
       {/* <TvShowsSlider /> */}
     </Fragment>
   );
