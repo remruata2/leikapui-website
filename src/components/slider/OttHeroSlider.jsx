@@ -219,7 +219,7 @@ const OttHeroSlider = memo(() => {
                               {slide.title}
                             </h1>
                             <p className="line-count-3 RightAnimate-two">
-                              {t("ott_home.after_death")}
+                              ${slide.description}
                             </p>
                             <div>
                               <span className="font-size-14 fw-500">
