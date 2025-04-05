@@ -34,6 +34,7 @@ import {
   FaFilm,
   FaSignInAlt,
   FaSync,
+  FaHome,
 } from "react-icons/fa";
 
 // the hook
@@ -209,39 +210,34 @@ const HeaderDefault = memo((props) => {
                         as={Link}
                         to="/"
                         className={`${
-                          location.pathname === "/" ||
-                          location.pathname === "/dashboard" ||
-                          location.pathname === "/home" ||
-                          location.pathname === "/movie"
-                            ? "active"
-                            : ""
+                          location.pathname === "/" ? "active" : ""
+                        }`}
+                        onClick={() => setShow1(false)}
+                      >
+                        <div className="menu-icon-wrapper">
+                          <FaHome />
+                        </div>
+                        <span className="item-name">{t("header.home")}</span>
+                      </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item as="li">
+                      <Nav.Link
+                        as={Link}
+                        to="/movies"
+                        className={`${
+                          location.pathname === "/movies" ? "active" : ""
                         }`}
                         onClick={() => setShow1(false)}
                       >
                         <div className="menu-icon-wrapper">
                           <FaFilm />
                         </div>
-                        <span className="item-name">{t("header.movie")}</span>
+                        <span className="item-name">Movies</span>
                       </Nav.Link>
                     </Nav.Item>
 
                     {isAuthenticated ? (
                       <>
-                        <Nav.Item as="li">
-                          <Nav.Link
-                            as={Link}
-                            to="/profile"
-                            className={`${
-                              location.pathname === "/profile" ? "active" : ""
-                            }`}
-                            onClick={() => setShow1(false)}
-                          >
-                            <div className="menu-icon-wrapper">
-                              <FaUser />
-                            </div>
-                            <span className="item-name">Profile</span>
-                          </Nav.Link>
-                        </Nav.Item>
                         <Nav.Item as="li">
                           <Nav.Link
                             as={Link}
@@ -270,6 +266,21 @@ const HeaderDefault = memo((props) => {
                               <FaDesktop />
                             </div>
                             <span className="item-name">Devices</span>
+                          </Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item as="li">
+                          <Nav.Link
+                            as={Link}
+                            to="/profile"
+                            className={`${
+                              location.pathname === "/profile" ? "active" : ""
+                            }`}
+                            onClick={() => setShow1(false)}
+                          >
+                            <div className="menu-icon-wrapper">
+                              <FaUser />
+                            </div>
+                            <span className="item-name">Profile</span>
                           </Nav.Link>
                         </Nav.Item>
                         <Nav.Item as="li">
