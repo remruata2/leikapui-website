@@ -98,31 +98,35 @@ const DetailPage = memo(() => {
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
+      console.log("Fetching data for movie:", movieId);
 
-      // Fetch all data in parallel
-      const [movieResponse, likeStatusResponse, likeCountResponse] =
-        await Promise.all([
-          axios.get(`${apiUrl}/api/movies/${movieId}`),
-          user
-            ? axios.get(`${apiUrl}/api/movies/${movieId}/like-status`, {
-                params: { userId: user._id },
-              })
-            : Promise.resolve(null),
-          axios.get(`${apiUrl}/api/movies/${movieId}/like-count`),
-        ]);
+      // Fetch movie data and like count in parallel
+      const [movieResponse, likeCountResponse] = await Promise.all([
+        axios.get(`${apiUrl}/api/movies/${movieId}`),
+        axios.get(`${apiUrl}/api/movies/${movieId}/like-count`),
+      ]);
 
-      // Extract and set movie data
+      console.log("Like count response:", likeCountResponse.data);
+
+      // Set movie data
       const movieData = movieResponse.data.data;
       setSelectedMovie(movieData);
 
-      // Set like status if user is authenticated
-      if (likeStatusResponse) {
-        setIsLiked(likeStatusResponse.data.isLiked);
+      // Set like count - Note the change from likesCount to likeCount
+      if (likeCountResponse?.data?.success) {
+        console.log("Setting like count to:", likeCountResponse.data.likeCount);
+        setLikeCount(likeCountResponse.data.likeCount);
       }
 
-      // Set like count
-      if (likeCountResponse) {
-        setLikeCount(likeCountResponse.data.likesCount);
+      // If user is authenticated, fetch like status
+      if (user && isAuthenticated) {
+        const likeStatusResponse = await axios.get(
+          `${apiUrl}/api/movies/${movieId}/like-status`,
+          {
+            params: { userId: user._id },
+          }
+        );
+        setIsLiked(likeStatusResponse.data.isLiked);
       }
 
       // Set video IDs from movie_url object if available
@@ -189,10 +193,12 @@ const DetailPage = memo(() => {
       setPersonDetails(personDetails);
     } catch (error) {
       console.error("Error fetching data:", error);
+      // Initialize like count to 0 if fetch fails
+      setLikeCount(0);
     } finally {
       setIsLoading(false);
     }
-  }, [apiUrl, movieId, user]);
+  }, [apiUrl, movieId, user, isAuthenticated]);
 
   useEffect(() => {
     fetchData();
@@ -321,15 +327,17 @@ const DetailPage = memo(() => {
         const response = await axios.get(
           `${apiUrl}/api/movies/${movieId}/like-count`
         );
-        setLikeCount(response.data.likesCount);
+        console.log("Periodic like count update:", response.data);
+        if (response.data.success) {
+          setLikeCount(response.data.likeCount); // Note: changed from likesCount to likeCount
+        }
       } catch (error) {
         console.error("Error fetching like count:", error);
       }
     };
 
-    // Fetch like count initially and set up interval
     fetchLikeCount();
-    const interval = setInterval(fetchLikeCount, 10000); // Refresh every 10 seconds
+    const interval = setInterval(fetchLikeCount, 10000);
 
     return () => clearInterval(interval);
   }, [apiUrl, movieId]);
@@ -690,33 +698,40 @@ const DetailPage = memo(() => {
       return;
     }
 
+    // Optimistically update UI
+    const newIsLiked = !isLiked;
+    setIsLiked(newIsLiked);
+    setLikeCount((prev) => prev + (newIsLiked ? 1 : -1));
+
     try {
       const token = localStorage.getItem("jwtToken");
-      // Use toggle-like endpoint with the same parameters as in MovieDetails.tsx
       const response = await axios.post(
         `${apiUrl}/api/movies/${movieId}/toggle-like`,
         {
           userId: user._id,
-          isLiked: !isLiked,
+          isLiked: newIsLiked,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      // Update state based on response
-      if (response.data.success) {
-        setIsLiked(response.data.isLiked);
-        setLikeCount((prev) => prev + (response.data.isLiked ? 1 : -1));
+      if (!response.data.success) {
+        // Revert optimistic update if request failed
+        setIsLiked(!newIsLiked);
+        setLikeCount((prev) => prev + (newIsLiked ? -1 : 1));
       }
     } catch (error) {
       console.error("Error liking the movie:", error);
-      // Handle 401 unauthorized errors
+      // Revert optimistic update on error
+      setIsLiked(!newIsLiked);
+      setLikeCount((prev) => prev + (newIsLiked ? -1 : 1));
+
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         navigate("/login", { state: { from: location } });
         return;
       }
-      // Show error notification
+
       Swal.fire({
         title: "Error",
         text: "Failed to update like status",
@@ -806,6 +821,7 @@ const DetailPage = memo(() => {
                             <span
                               onClick={handleLikeClick}
                               style={{ cursor: "pointer" }}
+                              className="like-button"
                             >
                               {isLiked ? (
                                 <FaHeart className="text-primary" size={20} />
@@ -815,10 +831,19 @@ const DetailPage = memo(() => {
                             </span>
                           </li>
                         </ul>
-                        <span className="text-white">
-                          {likeCount > 0
-                            ? `${likeCount} like${likeCount > 1 ? "s" : ""}`
-                            : "Be the first to like"}
+                        <span className="text-white like-count">
+                          {typeof likeCount === "number" ? (
+                            likeCount > 0 ? (
+                              `${likeCount} like${likeCount !== 1 ? "s" : ""}`
+                            ) : (
+                              "Be the first to like"
+                            )
+                          ) : (
+                            // Show loading state if likeCount is not yet loaded
+                            <span className="loading-dots">
+                              Loading likes...
+                            </span>
+                          )}
                         </span>
                       </div>
 
