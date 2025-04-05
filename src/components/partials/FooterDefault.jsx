@@ -57,7 +57,9 @@ const FooterDefault = memo(() => {
               <Row className="space-between gx-5">
                 {/* Downloads Section */}
                 <Col xs={12} md={6} className="mb-5 mb-md-0">
-                  <h5 className="text-white mb-4 text-center text-md-start">Download Our App</h5>
+                  <h5 className="text-white mb-4 text-center text-md-start">
+                    Download Our App
+                  </h5>
                   <p className="font-size-14 mb-4 text-center text-md-start">
                     Get the best streaming experience on your preferred device
                   </p>
@@ -79,7 +81,7 @@ const FooterDefault = memo(() => {
                       </div>
                       <Button
                         as="a"
-                        href="/assets/apps/leikapui.apk"
+                        href="https://leikapui.b-cdn.net/leikapui%20(3).apk"
                         download
                         variant="primary"
                         size="sm"
@@ -128,10 +130,15 @@ const FooterDefault = memo(() => {
                 {/* Email and Links section - hidden on mobile */}
                 {!isMobile && (
                   <Col xs={12} md={6} className="ps-md-5">
-                    <h5 className="text-white mb-4 text-center text-md-start">Important Links</h5>
+                    <h5 className="text-white mb-4 text-center text-md-start">
+                      Important Links
+                    </h5>
                     <ul className="list-unstyled footer-link-list">
                       <li className="mb-3">
-                        <a href="mailto:support@leikapuistudios.com" className="text-white-50 hover-white">
+                        <a
+                          href="mailto:support@leikapuistudios.com"
+                          className="text-white-50 hover-white"
+                        >
                           Email Us: support@leikapuistudios.com
                         </a>
                       </li>
