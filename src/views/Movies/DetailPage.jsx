@@ -481,7 +481,7 @@ const DetailPage = memo(() => {
     location,
   ]);
 
-  // Function to handle the actual payment process
+  // Update the processPayment function to handle webhooks better
   const processPayment = async (userData) => {
     try {
       setPaymentLoading(true);
@@ -523,13 +523,6 @@ const DetailPage = memo(() => {
       const transactionId = orderResponse.data.transaction_id;
       const paymentReference = orderResponse.data.paymentReference;
 
-      console.log("Creating Razorpay instance with options:", {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: orderResponse.data.amount,
-        currency: "INR",
-        order_id: orderResponse.data.order_id,
-      });
-
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: orderResponse.data.amount,
@@ -548,7 +541,8 @@ const DetailPage = memo(() => {
               "Payment successful, verifying with backend:",
               response
             );
-            // Verify the payment with backend
+
+            // Initial verification
             const verifyResponse = await axios.post(
               `${apiUrl}/api/payments/verify`,
               {
@@ -558,8 +552,8 @@ const DetailPage = memo(() => {
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_signature: response.razorpay_signature,
-                transactionId: transactionId, // Add missing required field
-                paymentReference: paymentReference, // Add missing required field
+                transactionId: transactionId,
+                paymentReference: paymentReference,
                 deviceInfo: {
                   deviceType: "web",
                   browser: navigator.userAgent,
@@ -567,35 +561,27 @@ const DetailPage = memo(() => {
               }
             );
 
-            console.log("Verification response:", verifyResponse.data);
-
             if (verifyResponse.data.success) {
               setPaymentId(verifyResponse.data.transactionId);
               setPaymentStatus("processing");
+
+              // Show initial success message
               Swal.fire({
-                title: "Payment Successful",
-                text: "Your payment has been processed successfully.",
-                icon: "success",
+                title: "Payment Received",
+                text: "Your payment is being processed. Please wait...",
+                icon: "info",
+                showConfirmButton: false,
+                timer: 2000,
               });
-              // Refresh payment status
-              fetchData();
+
+              // Start polling with longer interval (webhook should handle the update first)
+              startPollingPaymentStatus(verifyResponse.data.transactionId);
             } else {
-              throw new Error("Payment verification failed");
+              throw new Error("Initial payment verification failed");
             }
           } catch (error) {
             console.error("Payment verification error:", error);
-            console.error("Error response:", error.response?.data);
-            setPaymentStatus("failed");
-            Swal.fire({
-              title: "Payment Failed",
-              text:
-                error.response?.data?.message ||
-                error.message ||
-                "Payment verification failed",
-              icon: "error",
-            });
-          } finally {
-            setPaymentLoading(false);
+            handlePaymentError(error);
           }
         },
         modal: {
@@ -608,25 +594,94 @@ const DetailPage = memo(() => {
       const rzp = new window.Razorpay(options);
       rzp.on("payment.failed", function (response) {
         console.error("Payment failed:", response.error);
-        Swal.fire({
-          title: "Payment Failed",
-          text: response.error.description || "Payment could not be completed",
-          icon: "error",
-        });
-        setPaymentLoading(false);
+        handlePaymentError(response.error);
       });
 
       console.log("Opening Razorpay modal");
       rzp.open();
     } catch (error) {
       console.error("Payment process error:", error);
-      setPaymentLoading(false);
-      Swal.fire({
-        title: "Payment Error",
-        text: error.message || "An error occurred during payment",
-        icon: "error",
-      });
+      handlePaymentError(error);
     }
+  };
+
+  // Add new function to handle payment errors
+  const handlePaymentError = (error) => {
+    setPaymentLoading(false);
+    setPaymentStatus("failed");
+    Swal.fire({
+      title: "Payment Failed",
+      text:
+        error.description || error.message || "Payment could not be completed",
+      icon: "error",
+    });
+  };
+
+  // Add new function to handle payment status polling
+  const startPollingPaymentStatus = async (transactionId) => {
+    let attempts = 0;
+    const maxAttempts = 12; // 2 minutes total (10 seconds * 12)
+    const pollingInterval = 10000; // 10 seconds
+
+    const pollStatus = async () => {
+      if (attempts >= maxAttempts) {
+        console.log("Max polling attempts reached");
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem("jwtToken");
+        if (!token) return;
+
+        const response = await axios.get(
+          `${apiUrl}/api/payments/transaction-status/${transactionId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        console.log(
+          `Payment status check attempt ${attempts + 1}:`,
+          response.data
+        );
+
+        if (response.data.success) {
+          if (response.data.transaction.status === "completed") {
+            setPaymentStatus("success");
+            Swal.fire({
+              title: "Payment Successful",
+              text: "Your payment has been processed successfully.",
+              icon: "success",
+            });
+            fetchData(); // Refresh the page data
+            return;
+          } else if (response.data.transaction.status === "failed") {
+            setPaymentStatus("failed");
+            Swal.fire({
+              title: "Payment Failed",
+              text: "The payment could not be processed",
+              icon: "error",
+            });
+            return;
+          }
+        }
+
+        attempts++;
+        if (attempts < maxAttempts) {
+          setTimeout(pollStatus, pollingInterval);
+        }
+      } catch (error) {
+        console.error("Error checking payment status:", error);
+        // Continue polling despite errors
+        attempts++;
+        if (attempts < maxAttempts) {
+          setTimeout(pollStatus, pollingInterval);
+        }
+      }
+    };
+
+    // Start polling
+    setTimeout(pollStatus, 5000); // Initial delay of 5 seconds
   };
 
   const handleLikeClick = useCallback(async () => {
