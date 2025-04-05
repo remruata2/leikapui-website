@@ -81,7 +81,7 @@ const FooterDefault = memo(() => {
                       </div>
                       <Button
                         as="a"
-                        href="https://leikapui.b-cdn.net/leikapui%20(3).apk"
+                        href="https://leikapui.b-cdn.net/application-0b3f3992-3731-47dd-a8ea-df5f915fe3c7.apk"
                         download
                         variant="primary"
                         size="sm"
