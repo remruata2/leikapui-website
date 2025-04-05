@@ -10,7 +10,9 @@
     "dev": "vite --port 3000",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "git-push": "./scripts/git-push.sh",
+    "git-pull": "./scripts/git-pull.sh"
   },
   "dependencies": {
     "@greatsumini/react-facebook-login": "^3.3.3",
